@@ -1,928 +1,1064 @@
 <!DOCTYPE html>
 <html lang="th">
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>บทความทั้งหมด | GameReviewTH</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
-        :root {
-            --primary: #6a11cb;
-            --secondary: #2575fc;
-            --accent: #ff4d4d;
-            --dark: #1e272e;
-            --light: #f8fafc;
-            --gray: #64748b;
-            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Kanit', sans-serif;
-            line-height: 1.6;
-            color: var(--dark);
-            background-color: #f1f5f9;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-        
-        /* Header */
-        .main-header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 3rem 0;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .logo-icon {
-            color: var(--accent);
-        }
-        
-        .site-description {
-            max-width: 600px;
-            margin: 0 auto;
-            opacity: 0.9;
-        }
-        
-        /* Navigation */
-        .main-nav {
-            background: white;
-            box-shadow: var(--card-shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-        }
-        
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 1.5rem;
-        }
-        
-        .nav-link {
-            color: var(--dark);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 0;
-            position: relative;
-            transition: var(--transition);
-        }
-        
-        .nav-link:hover {
-            color: var(--primary);
-        }
-        
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background-color: var(--accent);
-            transition: var(--transition);
-        }
-        
-        .nav-link:hover::after {
-            width: 100%;
-        }
-        
-        /* Content Grid */
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        /* News Card */
-        .news-card {
-            background: white;
-            border-radius: 0.75rem;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            transition: var(--transition);
-            cursor: pointer;
-        }
-        
-        .news-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-        }
-        
-        .news-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-        
-        .news-body {
-            padding: 1.5rem;
-        }
-        
-        .news-category {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background-color: var(--primary);
-            color: white;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-bottom: 0.75rem;
-        }
-        
-        .news-rating {
-            display: inline-block;
-            background-color: var(--accent);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-bottom: 0.75rem;
-            margin-left: 0.5rem;
-        }
-        
-        .news-title {
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-            line-height: 1.4;
-        }
-        
-        .news-excerpt {
-            color: var(--gray);
-            margin-bottom: 1rem;
-        }
-        
-        .news-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.875rem;
-            color: var(--gray);
-        }
-        
-        .news-date {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .news-readmore {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-        }
-        
-        .news-readmore:hover {
-            color: var(--secondary);
-            text-decoration: underline;
-        }
-        
-        /* Featured News */
+      :root {
+        --primary: #6a11cb;
+        --secondary: #2575fc;
+        --accent: #ff4d4d;
+        --dark: #1e272e;
+        --light: #f8fafc;
+        --gray: #64748b;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Kanit", sans-serif;
+        line-height: 1.6;
+        color: var(--dark);
+        background-color: #f1f5f9;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+
+      /* Header */
+      .main-header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .logo {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .logo-icon {
+        color: var(--accent);
+      }
+
+      .site-description {
+        max-width: 600px;
+        margin: 0 auto;
+        opacity: 0.9;
+      }
+
+      /* Navigation */
+      .main-nav {
+        background: white;
+        box-shadow: var(--card-shadow);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+      }
+
+      .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 1.5rem;
+      }
+
+      .nav-link {
+        color: var(--dark);
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem 0;
+        position: relative;
+        transition: var(--transition);
+      }
+
+      .nav-link:hover {
+        color: var(--primary);
+      }
+
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--accent);
+        transition: var(--transition);
+      }
+
+      .nav-link:hover::after {
+        width: 100%;
+      }
+
+      /* Content Grid */
+      .content-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin: 0 auto;
+        max-width: 1200px;
+      }
+
+      /* News Card */
+      .news-card {
+        background: white;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .card {
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: var(--card-shadow);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .news-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .news-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 0.75rem 0.75rem 0 0;
+      }
+
+      .news-body {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .news-category {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background-color: var(--primary);
+        color: white;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-bottom: 0.75rem;
+      }
+
+      .news-rating {
+        display: inline-block;
+        background-color: var(--accent);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-bottom: 0.75rem;
+        margin-left: 0.5rem;
+      }
+
+      .news-title {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+      }
+
+      .news-excerpt {
+        color: var(--gray);
+        margin-bottom: 1rem;
+        flex: 1;
+      }
+
+      .news-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.875rem;
+        color: var(--gray);
+      }
+
+      .news-date {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .news-readmore {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+      }
+
+      .news-readmore:hover {
+        color: var(--secondary);
+        text-decoration: underline;
+      }
+
+      /* Featured News */
+      .featured-news {
+        grid-column: span 2;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .featured-news .news-image {
+        height: 300px;
+        object-fit: cover;
+        border-radius: 0.75rem 0 0 0.75rem;
+      }
+
+      .featured-news .news-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .featured-news .news-title {
+        font-size: 1.5rem;
+      }
+
+      /* Section Title */
+      .section-title {
+        font-size: 1.75rem;
+        margin: 3rem 0 1.5rem;
+        position: relative;
+        padding-bottom: 0.75rem;
+      }
+
+      .section-title::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(to right, var(--primary), var(--accent));
+        border-radius: 2px;
+      }
+
+      /* Footer */
+      .main-footer {
+        background: var(--dark);
+        color: white;
+        padding: 3rem 0;
+        margin-top: 3rem;
+      }
+
+      .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+      }
+
+      .footer-column h3 {
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        color: var(--accent);
+      }
+
+      .footer-links {
+        list-style: none;
+      }
+
+      .footer-link {
+        margin-bottom: 0.75rem;
+      }
+
+      .footer-link a {
+        color: #cbd5e1;
+        text-decoration: none;
+        transition: var(--transition);
+      }
+
+      .footer-link a:hover {
+        color: white;
+        padding-left: 0.5rem;
+      }
+
+      .social-links {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+
+      .social-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        color: white;
+        transition: var(--transition);
+      }
+
+      .social-link:hover {
+        background-color: var(--accent);
+        transform: translateY(-3px);
+      }
+
+      .copyright {
+        text-align: center;
+        padding-top: 2rem;
+        margin-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: #94a3b8;
+        font-size: 0.875rem;
+      }
+
+      /* Popup Styles */
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+      }
+
+      .popup-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .popup-content {
+        background-color: white;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 2rem;
+        position: relative;
+        transform: translateY(20px);
+        transition: all 0.3s;
+      }
+
+      .popup-overlay.active .popup-content {
+        transform: translateY(0);
+      }
+
+      .popup-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--accent);
+      }
+
+      .popup-image {
+        max-height: 400px;
+        width: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+      }
+
+      .popup-title {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        color: var(--primary);
+      }
+
+      .popup-rating {
+        display: inline-block;
+        background-color: var(--accent);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+      }
+
+      .popup-description {
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+      }
+
+      .popup-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 1.5rem;
+      }
+
+      /* Navigation Buttons */
+      .nav-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2rem 0;
+        flex-wrap: wrap;
+      }
+
+      .nav-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background-color: var(--primary);
+        color: white;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 500;
+        transition: all 0.3s;
+      }
+
+      .nav-button:hover {
+        background-color: var(--secondary);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      @media (max-width: 768px) {
         .featured-news {
-            grid-column: span 2;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+          grid-column: span 1;
+          grid-template-columns: 1fr;
         }
-        
+
         .featured-news .news-image {
-            height: 100%;
+          border-radius: 0.75rem 0.75rem 0 0;
+          height: 200px;
         }
-        
-        .featured-news .news-body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+
+        .nav-container {
+          flex-direction: column;
+          gap: 1rem;
         }
-        
-        .featured-news .news-title {
-            font-size: 1.5rem;
+
+        .nav-links {
+          gap: 1rem;
         }
-        
-        /* Section Title */
-        .section-title {
-            font-size: 1.75rem;
-            margin: 3rem 0 1.5rem;
-            position: relative;
-            padding-bottom: 0.75rem;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            border-radius: 2px;
-        }
-        
-        /* Footer */
-        .main-footer {
-            background: var(--dark);
-            color: white;
-            padding: 3rem 0;
-            margin-top: 3rem;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-        }
-        
-        .footer-column h3 {
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
-            color: var(--accent);
-        }
-        
-        .footer-links {
-            list-style: none;
-        }
-        
-        .footer-link {
-            margin-bottom: 0.75rem;
-        }
-        
-        .footer-link a {
-            color: #cbd5e1;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-        
-        .footer-link a:hover {
-            color: white;
-            padding-left: 0.5rem;
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        
-        .social-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background-color: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            color: white;
-            transition: var(--transition);
-        }
-        
-        .social-link:hover {
-            background-color: var(--accent);
-            transform: translateY(-3px);
-        }
-        
-        .copyright {
-            text-align: center;
-            padding-top: 2rem;
-            margin-top: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            color: #94a3b8;
-            font-size: 0.875rem;
-        }
-        
-        /* Popup Styles */
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0,0,0,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-        
-        .popup-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
+
         .popup-content {
-            background-color: white;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 2rem;
-            position: relative;
-            transform: translateY(20px);
-            transition: all 0.3s;
+          padding: 1.5rem;
         }
-        
-        .popup-overlay.active .popup-content {
-            transform: translateY(0);
-        }
-        
-        .popup-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--accent);
-        }
-        
-        .popup-image {
-            width: 100%;
-            max-height: 300px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-        }
-        
+
         .popup-title {
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
+          font-size: 1.5rem;
         }
-        
-        .popup-rating {
-            display: inline-block;
-            background-color: var(--accent);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-bottom: 1.5rem;
+
+        .popup-image {
+          max-height: 250px;
         }
-        
-        .popup-description {
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-        }
-        
-        .popup-meta {
-            display: flex;
-            justify-content: space-between;
-            color: #64748b;
-            font-size: 0.9rem;
-            margin-top: 1.5rem;
-        }
-        
-        /* Navigation Buttons */
-        .nav-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-        
-        .nav-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background-color: var(--primary);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .nav-button:hover {
-            background-color: var(--secondary);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        @media (max-width: 768px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .featured-news {
-                grid-column: span 1;
-                grid-template-columns: 1fr;
-            }
-            
-            .featured-news .news-image {
-                height: 200px;
-            }
-            
-            .nav-container {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .nav-links {
-                gap: 1rem;
-            }
-            
-            .popup-content {
-                padding: 1.5rem;
-            }
-            
-            .popup-title {
-                font-size: 1.5rem;
-            }
-        }
+      }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-    
-</head>
-
-<script>
+  <script>
     // ตรวจสอบสิทธิ์การเข้าถึงหน้า admin
-    document.addEventListener('DOMContentLoaded', function() {
-        const adminLinks = document.querySelectorAll('a[href="commant.html"]');
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        const userRole = localStorage.getItem('userRole');
-        
-        adminLinks.forEach(link => {
-            if (!isLoggedIn || userRole !== 'admin') {
-                link.style.display = 'none';
-            } else {
-                link.style.display = 'inline-flex';
-            }
-        });
-        
-        // สำหรับลิงก์ไปยังหน้า admin ใน navbar
-        const adminNavLinks = document.querySelectorAll('.nav-links a[href="commant.html"]');
-        adminNavLinks.forEach(link => {
-            if (!isLoggedIn || userRole !== 'admin') {
-                link.parentElement.style.display = 'none';
-            }
-        });
+    document.addEventListener("DOMContentLoaded", function () {
+      const adminLinks = document.querySelectorAll('a[href="commant.html"]');
+      const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+      const userRole = localStorage.getItem("userRole");
+
+      adminLinks.forEach((link) => {
+        if (!isLoggedIn || userRole !== "admin") {
+          link.style.display = "none";
+        } else {
+          link.style.display = "inline-flex";
+        }
+      });
+
+      // สำหรับลิงก์ไปยังหน้า admin ใน navbar
+      const adminNavLinks = document.querySelectorAll(
+        '.nav-links a[href="commant.html"]'
+      );
+      adminNavLinks.forEach((link) => {
+        if (!isLoggedIn || userRole !== "admin") {
+          link.parentElement.style.display = "none";
+        }
+      });
     });
 
     // ฟังก์ชันโหลดและแสดงเนื้อหา
     function loadContents() {
-        // ...โค้ดเดิม...
+      // ...โค้ดเดิม...
     }
-    
+
     // ฟังก์ชันโหลดและแสดงเนื้อหา
-async function loadContents() {
-    // กำหนดค่า Firebase
-    const firebaseConfig = {
+    async function loadContents() {
+      // กำหนดค่า Firebase
+      const firebaseConfig = {
         apiKey: "AIzaSyBH_El7Vs4Xl6thuWfzj-3lj7hjSX9bNxU",
         authDomain: "websidereview.firebaseapp.com",
         projectId: "websidereview",
         storageBucket: "websidereview.appspot.com",
         messagingSenderId: "639370022712",
         appId: "1:639370022712:web:50fea21bd2c26631dd3bcd",
-        measurementId: "G-B29PMGT2XL"
-    };
+        measurementId: "G-B29PMGT2XL",
+      };
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    
-    try {
-        const snapshot = await db.collection('contents')
-            .orderBy('createdAt', 'desc')
-            .get();
-        
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      try {
+        const snapshot = await db
+          .collection("contents")
+          .orderBy("createdAt", "desc")
+          .get();
+
         if (snapshot.empty) {
-            console.log('No contents found');
-            return;
+          console.log("No contents found");
+          return;
         }
-        
-        let contents = [];
-        snapshot.forEach(doc => {
-            contents.push({
-                id: doc.id,
-                ...doc.data()
-            });
-        });
-        
-        // แสดงรีวิวเกม
-        const newsGrid = document.getElementById('newsGrid');
-        const reviewContents = contents.filter(content => content.type === 'review');
-        newsGrid.innerHTML = renderContents(reviewContents);
-        
-        // แสดงบทความ
-        const articlesGrid = document.getElementById('articlesGrid');
-        const articleContents = contents.filter(content => content.type === 'article');
-        articlesGrid.innerHTML = renderContents(articleContents);
-        
-        // แสดงข่าวสาร
-        const portfolioGrid = document.getElementById('portfolioGrid');
-        const newsContents = contents.filter(content => content.type === 'news');
-        portfolioGrid.innerHTML = renderContents(newsContents);
-    } catch (error) {
-        console.error('Error loading contents: ', error);
-    }
-}
 
-// ฟังก์ชันแสดงเนื้อหา
-function renderContents(contents) {
-    return contents.map(content => `
+        let contents = [];
+        snapshot.forEach((doc) => {
+          contents.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+
+        // แสดงรีวิวเกม
+        const newsGrid = document.getElementById("newsGrid");
+        const reviewContents = contents.filter(
+          (content) => content.type === "review"
+        );
+        newsGrid.innerHTML = renderContents(reviewContents);
+
+        // แสดงบทความ
+        const articlesGrid = document.getElementById("articlesGrid");
+        const articleContents = contents.filter(
+          (content) => content.type === "article"
+        );
+        articlesGrid.innerHTML = renderContents(articleContents);
+
+        // แสดงข่าวสาร
+        const portfolioGrid = document.getElementById("portfolioGrid");
+        const newsContents = contents.filter(
+          (content) => content.type === "news"
+        );
+        portfolioGrid.innerHTML = renderContents(newsContents);
+      } catch (error) {
+        console.error("Error loading contents: ", error);
+      }
+    }
+
+    // ฟังก์ชันแสดงเนื้อหา
+    function renderContents(contents) {
+      return contents
+        .map(
+          (content) => `
         <div class="news-card" onclick="showPopup(
             '${content.title}', 
-            ${content.rating ? `'${content.rating}'` : 'null'}, 
+            ${content.rating ? `'${content.rating}'` : "null"}, 
             '${content.description}', 
-            '${content.image || ''}', 
-            ${content.platforms ? JSON.stringify(content.platforms) : 'null'}, 
-            '${content.createdAt?.seconds ? new Date(content.createdAt.seconds * 1000).toISOString() : new Date().toISOString()}'
+            '${content.image || ""}', 
+            ${content.platforms ? JSON.stringify(content.platforms) : "null"}, 
+            '${
+              content.createdAt?.seconds
+                ? new Date(content.createdAt.seconds * 1000).toISOString()
+                : new Date().toISOString()
+            }'
         )">
-            ${content.rating ? `<div class="game-rating">${content.rating}</div>` : ''}
-            ${content.image ? `<img src="${content.image}" alt="${content.title}" class="game-img">` : ''}
+            ${
+              content.rating
+                ? `<div class="game-rating">${content.rating}</div>`
+                : ""
+            }
+            ${
+              content.image
+                ? `<img src="${content.image}" alt="${content.title}" class="game-img">`
+                : ""
+            }
             <div class="game-info">
                 <h3 class="game-title">${content.title}</h3>
-                ${content.platforms ? `
+                ${
+                  content.platforms
+                    ? `
                 <div class="game-platforms">
-                    ${content.platforms.map(platform => `<span class="platform-tag">${platform}</span>`).join('')}
-                </div>` : ''}
+                    ${content.platforms
+                      .map(
+                        (platform) =>
+                          `<span class="platform-tag">${platform}</span>`
+                      )
+                      .join("")}
+                </div>`
+                    : ""
+                }
                 <p>${content.description.substring(0, 100)}...</p>
             </div>
         </div>
-    `).join('');
-}
+    `
+        )
+        .join("");
+    }
 
-// โหลดข้อมูลเมื่อหน้าเว็บโหลดเสร็จ
-document.addEventListener('DOMContentLoaded', loadContents);
-</script>
+    // โหลดข้อมูลเมื่อหน้าเว็บโหลดเสร็จ
+    document.addEventListener("DOMContentLoaded", loadContents);
+  </script>
 
-
-<body>
+  <body>
     <!-- Header -->
     <header class="main-header">
-        <div class="container">
-            <div class="logo">
-                <i class="fas fa-gamepad logo-icon"></i>
-                <span>GameReviewTH</span>
-            </div>
-            <p class="site-description">
-                แหล่งรวมรีวิวเกม บทความและเนื้อหาเกี่ยวกับเกมโดยนักเล่นเกมตัวจริง
-            </p>
+      <div class="container">
+        <div class="logo">
+          <i class="fas fa-gamepad logo-icon"></i>
+          <span>GameReviewTH</span>
         </div>
+        <p class="site-description">
+          แหล่งรวมรีวิวเกม บทความและเนื้อหาเกี่ยวกับเกมโดยนักเล่นเกมตัวจริง
+        </p>
+      </div>
     </header>
-    
+
     <!-- Navigation -->
     <nav class="main-nav">
-        <div class="container nav-container">
-            <div class="logo">
-                <i class="fas fa-gamepad"></i>
-                <span>GameReviewTH</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="main.html" class="nav-link">หน้าหลัก</a></li>
-                <li><a href="#reviews" class="nav-link">รีวิวเกม</a></li>
-                <li><a href="#articles" class="nav-link">บทความ</a></li>
-                <li><a href="#news" class="nav-link">ข่าวสาร</a></li>
-                <li><a href="commant.html" class="nav-link" style="display: none;">จัดการเนื้อหา</a></li>
-            </ul>
-            <div class="user-section" id="userSection" style="display: none;">
-                <span id="usernameDisplay" style="margin-right: 1rem;"></span>
-                <button class="logout-btn" id="logoutBtn" style="padding: 0.5rem 1rem; background-color: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer; transition: all 0.3s;">
-                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
-                </button>
-            </div>
+      <div class="container nav-container">
+        <div class="logo">
+          <i class="fas fa-gamepad"></i>
+          <span>GameReviewTH</span>
         </div>
+        <ul class="nav-links">
+          <li><a href="main.html" class="nav-link">หน้าหลัก</a></li>
+          <li><a href="#reviews" class="nav-link">รีวิวเกม</a></li>
+          <li><a href="#articles" class="nav-link">บทความ</a></li>
+          <li><a href="#news" class="nav-link">ข่าวสาร</a></li>
+          <li>
+            <a href="commant.html" class="nav-link" style="display: none"
+              >จัดการเนื้อหา</a
+            >
+          </li>
+        </ul>
+        <div class="user-section" id="userSection" style="display: none">
+          <span id="usernameDisplay" style="margin-right: 1rem"></span>
+          <button
+            class="logout-btn"
+            id="logoutBtn"
+            style="
+              padding: 0.5rem 1rem;
+              background-color: var(--accent);
+              color: white;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              transition: all 0.3s;
+            "
+          >
+            <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+          </button>
+        </div>
+      </div>
     </nav>
 
     <!-- Navigation Buttons -->
     <div class="container">
-        <div class="nav-buttons">
-            <a href="main.html" class="nav-button">
-                <i class="fas fa-home"></i> กลับหน้าหลัก
-            </a>
-            <a href="#reviews" class="nav-button">
-                <i class="fas fa-star"></i> รีวิวเกม
-            </a>
-            <a href="#articles" class="nav-button">
-                <i class="fas fa-book"></i> บทความ
-            </a>
-            <a href="#news" class="nav-button">
-                <i class="fas fa-newspaper"></i> ข่าวสาร
-            </a>
-            <a href="commant.html" class="nav-button" style="background-color: var(--accent);">
-                <i class="fas fa-plus"></i> เพิ่มเนื้อหา
-            </a>
-        </div>
+      <div class="nav-buttons">
+        <a href="main.html" class="nav-button">
+          <i class="fas fa-home"></i> กลับหน้าหลัก
+        </a>
+        <a href="#reviews" class="nav-button">
+          <i class="fas fa-star"></i> รีวิวเกม
+        </a>
+        <a href="#articles" class="nav-button">
+          <i class="fas fa-book"></i> บทความ
+        </a>
+        <a href="#news" class="nav-button">
+          <i class="fas fa-newspaper"></i> ข่าวสาร
+        </a>
+        <a
+          href="commant.html"
+          class="nav-button"
+          style="background-color: var(--accent)"
+        >
+          <i class="fas fa-plus"></i> เพิ่มเนื้อหา
+        </a>
+      </div>
     </div>
 
     <!-- Main Content -->
     <main class="container">
-        <h2 class="section-title" id="reviews">รีวิวเกมล่าสุด</h2>
-        <div class="content-grid" id="newsGrid">
-            <!-- เนื้อหาจะถูกเพิ่มโดย JavaScript -->
-        </div>
-        
-        <h2 class="section-title" id="articles">บทความแนะนำ</h2>
-        <div class="content-grid" id="articlesGrid">
-            <!-- เนื้อหาจะถูกเพิ่มโดย JavaScript -->
-        </div>
-        
-        <h2 class="section-title" id="news">ข่าวสารเกม</h2>
-        <div class="content-grid" id="portfolioGrid">
-            <!-- เนื้อหาจะถูกเพิ่มโดย JavaScript -->
-        </div>
+      <h2 class="section-title" id="reviews">รีวิวเกมล่าสุด</h2>
+      <div class="content-grid" id="newsGrid">
+        <!-- เนื้อหาจะถูกเพิ่มโดย JavaScript -->
+      </div>
+
+      <h2 class="section-title" id="articles">บทความแนะนำ</h2>
+      <div class="content-grid" id="articlesGrid">
+        <!-- เนื้อหาจะถูกเพิ่มโดย JavaScript -->
+      </div>
+
+      <h2 class="section-title" id="news">ข่าวสารเกม</h2>
+      <div class="content-grid" id="portfolioGrid">
+        <!-- เนื้อหาจะถูกเพิ่มโดย JavaScript -->
+      </div>
     </main>
-    
+
     <!-- Popup Overlay -->
     <div class="popup-overlay" id="popupOverlay" onclick="closePopup()">
-        <div class="popup-content" onclick="event.stopPropagation()">
-            <span class="popup-close" onclick="closePopup()">&times;</span>
-            <img src="" alt="Popup Image" class="popup-image" id="popupImage">
-            <h2 class="popup-title" id="popupTitle"></h2>
-            <div class="popup-rating" id="popupRating" style="display: none;"></div>
-            <p class="popup-description" id="popupDescription"></p>
-            <div class="popup-meta">
-                <span id="popupDate"></span>
-            </div>
-            <div class="nav-buttons" style="margin-top: 1.5rem;">
-                <a href="#" id="buyLink" class="nav-button" style="display: none;">
-                    <i class="fas fa-shopping-cart"></i> ซื้อเกม
-                </a>
-                <a href="commant.html" class="nav-button">
-                    <i class="fas fa-edit"></i> แก้ไขเนื้อหา
-                </a>
-            </div>
+      <div class="popup-content" onclick="event.stopPropagation()">
+        <span class="popup-close" onclick="closePopup()">&times;</span>
+        <img src="" alt="Popup Image" class="popup-image" id="popupImage" />
+        <h2 class="popup-title" id="popupTitle"></h2>
+        <div class="popup-rating" id="popupRating" style="display: none"></div>
+        <p class="popup-description" id="popupDescription"></p>
+        <div class="popup-meta">
+          <span id="popupDate"></span>
         </div>
+        <div class="nav-buttons" style="margin-top: 1.5rem">
+          <a href="#" id="buyLink" class="nav-button" style="display: none">
+            <i class="fas fa-shopping-cart"></i> ซื้อเกม
+          </a>
+          <a href="commant.html" class="nav-button">
+            <i class="fas fa-edit"></i> แก้ไขเนื้อหา
+          </a>
+        </div>
+      </div>
     </div>
 
     <!-- Footer -->
     <footer class="main-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>เกี่ยวกับเรา</h3>
-                    <p>เราเป็นทีมนักเล่นเกมที่ต้องการแบ่งปันประสบการณ์การเล่นเกมอย่างตรงไปตรงมา เพื่อช่วยให้คุณตัดสินใจเลือกเกมที่เหมาะสม</p>
-                    <div class="social-links">
-                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-discord"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>ลิงก์ด่วน</h3>
-                    <ul class="footer-links">
-                        <li class="footer-link"><a href="main.html">หน้าหลัก</a></li>
-                        <li class="footer-link"><a href="#reviews">รีวิวเกม</a></li>
-                        <li class="footer-link"><a href="#articles">บทความ</a></li>
-                        <li class="footer-link"><a href="#news">ข่าวสาร</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>หมวดหมู่</h3>
-                    <ul class="footer-links">
-                        <li class="footer-link"><a href="#">เกม PC</a></li>
-                        <li class="footer-link"><a href="#">เกม Console</a></li>
-                        <li class="footer-link"><a href="#">เกมมือถือ</a></li>
-                        <li class="footer-link"><a href="#">เกมอินดี้</a></li>
-                    </ul>
-                </div>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-column">
+            <h3>เกี่ยวกับเรา</h3>
+            <p>
+              เราเป็นทีมนักเล่นเกมที่ต้องการแบ่งปันประสบการณ์การเล่นเกมอย่างตรงไปตรงมา
+              เพื่อช่วยให้คุณตัดสินใจเลือกเกมที่เหมาะสม
+            </p>
+            <div class="social-links">
+              <a href="#" class="social-link"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+              <a href="#" class="social-link"><i class="fab fa-discord"></i></a>
             </div>
-            
-            <div class="copyright">
-                <p>&copy; 2023 GameReviewTH. สงวนลิขสิทธิ์ทุกประการ</p>
-            </div>
+          </div>
+
+          <div class="footer-column">
+            <h3>ลิงก์ด่วน</h3>
+            <ul class="footer-links">
+              <li class="footer-link"><a href="main.html">หน้าหลัก</a></li>
+              <li class="footer-link"><a href="#reviews">รีวิวเกม</a></li>
+              <li class="footer-link"><a href="#articles">บทความ</a></li>
+              <li class="footer-link"><a href="#news">ข่าวสาร</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h3>หมวดหมู่</h3>
+            <ul class="footer-links">
+              <li class="footer-link"><a href="#">เกม PC</a></li>
+              <li class="footer-link"><a href="#">เกม Console</a></li>
+              <li class="footer-link"><a href="#">เกมมือถือ</a></li>
+              <li class="footer-link"><a href="#">เกมอินดี้</a></li>
+            </ul>
+          </div>
         </div>
+
+        <div class="copyright">
+          <p>&copy; 2023 GameReviewTH. สงวนลิขสิทธิ์ทุกประการ</p>
+        </div>
+      </div>
     </footer>
 
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBH_El7Vs4Xl6thuWfzj-3lj7hjSX9bNxU",
-            authDomain: "websidereview.firebaseapp.com",
-            projectId: "websidereview",
-            storageBucket: "websidereview.appspot.com",
-            messagingSenderId: "639370022712",
-            appId: "1:639370022712:web:50fea21bd2c26631dd3bcd",
-            measurementId: "G-B29PMGT2XL"
-        };
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBH_El7Vs4Xl6thuWfzj-3lj7hjSX9bNxU",
+        authDomain: "websidereview.firebaseapp.com",
+        projectId: "websidereview",
+        storageBucket: "websidereview.appspot.com",
+        messagingSenderId: "639370022712",
+        appId: "1:639370022712:web:50fea21bd2c26631dd3bcd",
+        measurementId: "G-B29PMGT2XL",
+      };
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
 
-        // ตรวจสอบสถานะการล็อกอินและแสดงข้อมูลผู้ใช้
-        document.addEventListener('DOMContentLoaded', function() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const userRole = localStorage.getItem('userRole');
-            const userSection = document.getElementById('userSection');
-            const usernameDisplay = document.getElementById('usernameDisplay');
-            const adminLinks = document.querySelectorAll('a[href="commant.html"]');
-            
-            if (isLoggedIn) {
-                // แสดงส่วนผู้ใช้
-                userSection.style.display = 'flex';
-                
-                // ตั้งค่าชื่อผู้ใช้
-                if (userRole === 'guest') {
-                    usernameDisplay.textContent = 'ผู้เยี่ยมชม';
-                } else {
-                    // ดึงข้อมูลผู้ใช้จาก Firestore สำหรับผู้ใช้ที่ลงทะเบียน
-                    const userId = localStorage.getItem('userId');
-                    if (userId) {
-                        db.collection('users').doc(userId).get().then((doc) => {
-                            if (doc.exists) {
-                                const userData = doc.data();
-                                usernameDisplay.textContent = userData.username || userData.email;
-                            }
-                        });
-                    }
-                }
-                
-                // ตรวจสอบบทบาท admin
-                if (userRole === 'admin') {
-                    adminLinks.forEach(link => {
-                        link.style.display = 'block';
-                    });
-                }
-            }
-            
-            // ปุ่มออกจากระบบ
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function() {
-                    auth.signOut().then(() => {
-                        localStorage.removeItem('isLoggedIn');
-                        localStorage.removeItem('userRole');
-                        localStorage.removeItem('userId');
-                        window.location.href = 'Login.html';
-                    });
+      // ตรวจสอบสถานะการล็อกอินและแสดงข้อมูลผู้ใช้
+      document.addEventListener("DOMContentLoaded", function () {
+        const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+        const userRole = localStorage.getItem("userRole");
+        const userSection = document.getElementById("userSection");
+        const usernameDisplay = document.getElementById("usernameDisplay");
+        const adminLinks = document.querySelectorAll('a[href="commant.html"]');
+
+        if (isLoggedIn) {
+          // แสดงส่วนผู้ใช้
+          userSection.style.display = "flex";
+
+          // ตั้งค่าชื่อผู้ใช้
+          if (userRole === "guest") {
+            usernameDisplay.textContent = "ผู้เยี่ยมชม";
+          } else {
+            // ดึงข้อมูลผู้ใช้จาก Firestore สำหรับผู้ใช้ที่ลงทะเบียน
+            const userId = localStorage.getItem("userId");
+            if (userId) {
+              db.collection("users")
+                .doc(userId)
+                .get()
+                .then((doc) => {
+                  if (doc.exists) {
+                    const userData = doc.data();
+                    usernameDisplay.textContent =
+                      userData.username || userData.email;
+                  }
                 });
             }
-        });
+          }
 
-        // ฟังก์ชันโหลดและแสดงเนื้อหา
-        async function loadContents() {
-            try {
-                const snapshot = await db.collection('contents')
-                    .orderBy('createdAt', 'desc')
-                    .get();
-                
-                if (snapshot.empty) {
-                    // ข้อมูลตัวอย่างหากไม่มีข้อมูลใน Firestore
-                    const sampleContents = [
-                        {
-                            id: 'sample1',
-                            type: 'review',
-                            title: 'รีวิว Elden Ring - เกมโอเพนเวิลด์ที่สมบูรณ์แบบ',
-                            description: 'Elden Ring เป็นเกมที่ผสมผสานระหว่างความยากของเกม Souls กับโลกเปิดที่กว้างใหญ่และเต็มไปด้วยความลับ นี่คือรีวิวฉบับเต็มของเกมที่อาจจะดีที่สุดในปีนี้',
-                            image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
-                            createdAt: { seconds: 1678874400 },
-                            rating: '9.5/10',
-                            platforms: ['PS5', 'Xbox', 'PC']
-                        },
-                        // ข้อมูลตัวอย่างอื่นๆ...
-                    ];
-                    
-                    // แสดงรีวิวเกม
-                    const newsGrid = document.getElementById('newsGrid');
-                    const reviewContents = sampleContents.filter(content => content.type === 'review');
-                    newsGrid.innerHTML = renderContents(reviewContents, true);
-                    
-                    // แสดงบทความ
-                    const articlesGrid = document.getElementById('articlesGrid');
-                    const articleContents = sampleContents.filter(content => content.type === 'article');
-                    articlesGrid.innerHTML = renderContents(articleContents, true);
-                    
-                    // แสดงข่าวสาร
-                    const portfolioGrid = document.getElementById('portfolioGrid');
-                    const newsContents = sampleContents.filter(content => content.type === 'news');
-                    portfolioGrid.innerHTML = renderContents(newsContents, true);
-                    
-                    return;
-                }
-                
-                let contents = [];
-                snapshot.forEach(doc => {
-                    contents.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
-                });
-                
-                // แสดงรีวิวเกม
-                const newsGrid = document.getElementById('newsGrid');
-                const reviewContents = contents.filter(content => content.type === 'review');
-                newsGrid.innerHTML = renderContents(reviewContents, true);
-                
-                // แสดงบทความ
-                const articlesGrid = document.getElementById('articlesGrid');
-                const articleContents = contents.filter(content => content.type === 'article');
-                articlesGrid.innerHTML = renderContents(articleContents, true);
-                
-                // แสดงข่าวสาร
-                const portfolioGrid = document.getElementById('portfolioGrid');
-                const newsContents = contents.filter(content => content.type === 'news');
-                portfolioGrid.innerHTML = renderContents(newsContents, true);
-            } catch (error) {
-                console.error('Error loading contents: ', error);
-                alert('เกิดข้อผิดพลาดในการโหลดข้อมูลเนื้อหา กรุณา Login เพื่อเข้าชมเนื้อหา');
-            }
+          // ตรวจสอบบทบาท admin
+          if (userRole === "admin") {
+            adminLinks.forEach((link) => {
+              link.style.display = "block";
+            });
+          }
         }
 
-        // ฟังก์ชันแสดงเนื้อหา
-        function renderContents(contents, isSample = false) {
-            return contents.map(content => `
+        // ปุ่มออกจากระบบ
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", function () {
+            auth.signOut().then(() => {
+              localStorage.removeItem("isLoggedIn");
+              localStorage.removeItem("userRole");
+              localStorage.removeItem("userId");
+              window.location.href = "Login.html";
+            });
+          });
+        }
+      });
+
+      // ฟังก์ชันโหลดและแสดงเนื้อหา
+      async function loadContents() {
+        try {
+          const snapshot = await db
+            .collection("contents")
+            .orderBy("createdAt", "desc")
+            .get();
+
+          if (snapshot.empty) {
+            // ข้อมูลตัวอย่างหากไม่มีข้อมูลใน Firestore
+            const sampleContents = [
+              {
+                id: "sample1",
+                type: "review",
+                title: "รีวิว Elden Ring - เกมโอเพนเวิลด์ที่สมบูรณ์แบบ",
+                description:
+                  "Elden Ring เป็นเกมที่ผสมผสานระหว่างความยากของเกม Souls กับโลกเปิดที่กว้างใหญ่และเต็มไปด้วยความลับ นี่คือรีวิวฉบับเต็มของเกมที่อาจจะดีที่สุดในปีนี้",
+                image:
+                  "https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+                createdAt: { seconds: 1678874400 },
+                rating: "9.5/10",
+                platforms: ["PS5", "Xbox", "PC"],
+              },
+              // ข้อมูลตัวอย่างอื่นๆ...
+            ];
+
+            // แสดงรีวิวเกม
+            const newsGrid = document.getElementById("newsGrid");
+            const reviewContents = sampleContents.filter(
+              (content) => content.type === "review"
+            );
+            newsGrid.innerHTML = renderContents(reviewContents, true);
+
+            // แสดงบทความ
+            const articlesGrid = document.getElementById("articlesGrid");
+            const articleContents = sampleContents.filter(
+              (content) => content.type === "article"
+            );
+            articlesGrid.innerHTML = renderContents(articleContents, true);
+
+            // แสดงข่าวสาร
+            const portfolioGrid = document.getElementById("portfolioGrid");
+            const newsContents = sampleContents.filter(
+              (content) => content.type === "news"
+            );
+            portfolioGrid.innerHTML = renderContents(newsContents, true);
+
+            return;
+          }
+
+          let contents = [];
+          snapshot.forEach((doc) => {
+            contents.push({
+              id: doc.id,
+              ...doc.data(),
+            });
+          });
+
+          // แสดงรีวิวเกม
+          const newsGrid = document.getElementById("newsGrid");
+          const reviewContents = contents.filter(
+            (content) => content.type === "review"
+          );
+          newsGrid.innerHTML = renderContents(reviewContents, true);
+
+          // แสดงบทความ
+          const articlesGrid = document.getElementById("articlesGrid");
+          const articleContents = contents.filter(
+            (content) => content.type === "article"
+          );
+          articlesGrid.innerHTML = renderContents(articleContents, true);
+
+          // แสดงข่าวสาร
+          const portfolioGrid = document.getElementById("portfolioGrid");
+          const newsContents = contents.filter(
+            (content) => content.type === "news"
+          );
+          portfolioGrid.innerHTML = renderContents(newsContents, true);
+        } catch (error) {
+          console.error("Error loading contents: ", error);
+          alert(
+            "เกิดข้อผิดพลาดในการโหลดข้อมูลเนื้อหา กรุณา Login เพื่อเข้าชมเนื้อหา"
+          );
+        }
+      }
+
+      // ฟังก์ชันแสดงเนื้อหา
+      function renderContents(contents, isSample = false) {
+        return contents
+          .map(
+            (content) => `
                 <div class="news-card" onclick="showPopup(
                     '${content.title}', 
-                    ${content.rating ? `'${content.rating}'` : 'null'}, 
+                    ${content.rating ? `'${content.rating}'` : "null"}, 
                     '${content.description}', 
-                    '${content.image || ''}', 
-                    ${content.platforms ? JSON.stringify(content.platforms) : 'null'}, 
-                    '${content.createdAt?.seconds ? new Date(content.createdAt.seconds * 1000).toISOString() : new Date().toISOString()}'
+                    '${content.image || ""}', 
+                    ${
+                      content.platforms
+                        ? JSON.stringify(content.platforms)
+                        : "null"
+                    }, 
+                    '${
+                      content.createdAt?.seconds
+                        ? new Date(
+                            content.createdAt.seconds * 1000
+                          ).toISOString()
+                        : new Date().toISOString()
+                    }'
                 )">
-                    ${content.rating ? `<div class="game-rating">${content.rating}</div>` : ''}
-                    ${content.image ? `<img src="${content.image}" alt="${content.title}" class="game-img">` : ''}
+                    ${
+                      content.rating
+                        ? `<div class="game-rating">${content.rating}</div>`
+                        : ""
+                    }
+                    ${
+                      content.image
+                        ? `<img src="${content.image}" alt="${content.title}" class="game-img">`
+                        : ""
+                    }
                     <div class="game-info">
                         <h3 class="game-title">${content.title}</h3>
-                        ${content.platforms ? `
+                        ${
+                          content.platforms
+                            ? `
                         <div class="game-platforms">
-                            ${content.platforms.map(platform => `<span class="platform-tag">${platform}</span>`).join('')}
-                        </div>` : ''}
+                            ${content.platforms
+                              .map(
+                                (platform) =>
+                                  `<span class="platform-tag">${platform}</span>`
+                              )
+                              .join("")}
+                        </div>`
+                            : ""
+                        }
                         <p>${content.description.substring(0, 100)}...</p>
                     </div>
                 </div>
-            `).join('');
+            `
+          )
+          .join("");
+      }
+
+      // โหลดข้อมูลเมื่อหน้าเว็บโหลดเสร็จ
+      document.addEventListener("DOMContentLoaded", loadContents);
+
+      // ฟังก์ชันแสดง Popup
+      function showPopup(title, rating, description, image, platforms, date) {
+        const popup = document.getElementById("popupOverlay");
+        document.getElementById("popupTitle").textContent = title;
+        document.getElementById("popupDescription").textContent = description;
+        document.getElementById("popupImage").src = image;
+        document.getElementById("popupDate").textContent = new Date(
+          date
+        ).toLocaleDateString("th-TH");
+
+        const ratingElement = document.getElementById("popupRating");
+        if (rating) {
+          ratingElement.textContent = rating;
+          ratingElement.style.display = "inline-block";
+          document.getElementById("buyLink").style.display = "inline-block";
+        } else {
+          ratingElement.style.display = "none";
+          document.getElementById("buyLink").style.display = "none";
         }
 
-        // โหลดข้อมูลเมื่อหน้าเว็บโหลดเสร็จ
-        document.addEventListener('DOMContentLoaded', loadContents);
+        popup.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
 
-        // ฟังก์ชันแสดง Popup
-        function showPopup(title, rating, description, image, platforms, date) {
-            const popup = document.getElementById('popupOverlay');
-            document.getElementById('popupTitle').textContent = title;
-            document.getElementById('popupDescription').textContent = description;
-            document.getElementById('popupImage').src = image;
-            document.getElementById('popupDate').textContent = new Date(date).toLocaleDateString('th-TH');
-            
-            const ratingElement = document.getElementById('popupRating');
-            if (rating) {
-                ratingElement.textContent = rating;
-                ratingElement.style.display = 'inline-block';
-                document.getElementById('buyLink').style.display = 'inline-block';
-            } else {
-                ratingElement.style.display = 'none';
-                document.getElementById('buyLink').style.display = 'none';
-            }
-            
-            popup.classList.add('active');
-            document.body.style.overflow = 'hidden';
+      // ฟังก์ชันปิด Popup
+      function closePopup() {
+        document.getElementById("popupOverlay").classList.remove("active");
+        document.body.style.overflow = "auto";
+      }
+
+      // ปิด Popup เมื่อกดปุ่ม Escape
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          closePopup();
         }
-        
-        // ฟังก์ชันปิด Popup
-        function closePopup() {
-            document.getElementById('popupOverlay').classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-        
-        // ปิด Popup เมื่อกดปุ่ม Escape
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closePopup();
-            }
-        });
+      });
     </script>
-</body>
+  </body>
 </html>
