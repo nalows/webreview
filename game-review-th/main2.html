@@ -599,30 +599,28 @@ document.addEventListener('DOMContentLoaded', loadContents);
         </div>
     </header>
     
-
-    <!-- ในส่วนของ nav ในไฟล์ main2.html -->
-<!-- ในส่วนของ nav ในไฟล์ main2.html -->
-<nav class="main-nav">
-    <div class="container nav-container">
-        <div class="logo">
-            <i class="fas fa-gamepad"></i>
-            <span>GameReviewTH</span>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="container nav-container">
+            <div class="logo">
+                <i class="fas fa-gamepad"></i>
+                <span>GameReviewTH</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="main.html" class="nav-link">หน้าหลัก</a></li>
+                <li><a href="#reviews" class="nav-link">รีวิวเกม</a></li>
+                <li><a href="#articles" class="nav-link">บทความ</a></li>
+                <li><a href="#news" class="nav-link">ข่าวสาร</a></li>
+                <li><a href="commant.html" class="nav-link" style="display: none;">จัดการเนื้อหา</a></li>
+            </ul>
+            <div class="user-section" id="userSection" style="display: none;">
+                <span id="usernameDisplay" style="margin-right: 1rem;"></span>
+                <button class="logout-btn" id="logoutBtn" style="padding: 0.5rem 1rem; background-color: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer; transition: all 0.3s;">
+                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                </button>
+            </div>
         </div>
-        <ul class="nav-links">
-            <li><a href="main.html" class="nav-link">หน้าหลัก</a></li>
-            <li><a href="#reviews" class="nav-link">รีวิวเกม</a></li>
-            <li><a href="#articles" class="nav-link">บทความ</a></li>
-            <li><a href="#news" class="nav-link">ข่าวสาร</a></li>
-            <li><a href="commant.html" class="nav-link">จัดการเนื้อหา</a></li>
-        </ul>
-        <div class="user-section" id="userSection" style="display: none;">
-            <span id="usernameDisplay" style="margin-right: 1rem; color: var(--dark);"></span>
-            <button class="logout-btn" style="padding: 0.5rem 1rem; background-color: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer;">
-                <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
-            </button>
-        </div>
-    </div>
-</nav>
+    </nav>
 
     <!-- Navigation Buttons -->
     <div class="container">
@@ -728,23 +726,74 @@ document.addEventListener('DOMContentLoaded', loadContents);
     </footer>
 
     <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBH_El7Vs4Xl6thuWfzj-3lj7hjSX9bNxU",
+            authDomain: "websidereview.firebaseapp.com",
+            projectId: "websidereview",
+            storageBucket: "websidereview.appspot.com",
+            messagingSenderId: "639370022712",
+            appId: "1:639370022712:web:50fea21bd2c26631dd3bcd",
+            measurementId: "G-B29PMGT2XL"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ตรวจสอบสถานะการล็อกอินและแสดงข้อมูลผู้ใช้
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const userRole = localStorage.getItem('userRole');
+            const userSection = document.getElementById('userSection');
+            const usernameDisplay = document.getElementById('usernameDisplay');
+            const adminLinks = document.querySelectorAll('a[href="commant.html"]');
+            
+            if (isLoggedIn) {
+                // แสดงส่วนผู้ใช้
+                userSection.style.display = 'flex';
+                
+                // ตั้งค่าชื่อผู้ใช้
+                if (userRole === 'guest') {
+                    usernameDisplay.textContent = 'ผู้เยี่ยมชม';
+                } else {
+                    // ดึงข้อมูลผู้ใช้จาก Firestore สำหรับผู้ใช้ที่ลงทะเบียน
+                    const userId = localStorage.getItem('userId');
+                    if (userId) {
+                        db.collection('users').doc(userId).get().then((doc) => {
+                            if (doc.exists) {
+                                const userData = doc.data();
+                                usernameDisplay.textContent = userData.username || userData.email;
+                            }
+                        });
+                    }
+                }
+                
+                // ตรวจสอบบทบาท admin
+                if (userRole === 'admin') {
+                    adminLinks.forEach(link => {
+                        link.style.display = 'block';
+                    });
+                }
+            }
+            
+            // ปุ่มออกจากระบบ
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    auth.signOut().then(() => {
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('userRole');
+                        localStorage.removeItem('userId');
+                        window.location.href = 'Login.html';
+                    });
+                });
+            }
+        });
+
         // ฟังก์ชันโหลดและแสดงเนื้อหา
         async function loadContents() {
-            // กำหนดค่า Firebase
-            const firebaseConfig = {
-                apiKey: "AIzaSyBH_El7Vs4Xl6thuWfzj-3lj7hjSX9bNxU",
-                authDomain: "websidereview.firebaseapp.com",
-                projectId: "websidereview",
-                storageBucket: "websidereview.appspot.com",
-                messagingSenderId: "639370022712",
-                appId: "1:639370022712:web:50fea21bd2c26631dd3bcd",
-                measurementId: "G-B29PMGT2XL"
-            };
-    
-            // Initialize Firebase
-            const app = firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore();
-            
             try {
                 const snapshot = await db.collection('contents')
                     .orderBy('createdAt', 'desc')
@@ -811,94 +860,69 @@ document.addEventListener('DOMContentLoaded', loadContents);
                 alert('เกิดข้อผิดพลาดในการโหลดข้อมูลเนื้อหา กรุณา Login เพื่อเข้าชมเนื้อหา');
             }
         }
-        
+
+        // ฟังก์ชันแสดงเนื้อหา
+        function renderContents(contents, isSample = false) {
+            return contents.map(content => `
+                <div class="news-card" onclick="showPopup(
+                    '${content.title}', 
+                    ${content.rating ? `'${content.rating}'` : 'null'}, 
+                    '${content.description}', 
+                    '${content.image || ''}', 
+                    ${content.platforms ? JSON.stringify(content.platforms) : 'null'}, 
+                    '${content.createdAt?.seconds ? new Date(content.createdAt.seconds * 1000).toISOString() : new Date().toISOString()}'
+                )">
+                    ${content.rating ? `<div class="game-rating">${content.rating}</div>` : ''}
+                    ${content.image ? `<img src="${content.image}" alt="${content.title}" class="game-img">` : ''}
+                    <div class="game-info">
+                        <h3 class="game-title">${content.title}</h3>
+                        ${content.platforms ? `
+                        <div class="game-platforms">
+                            ${content.platforms.map(platform => `<span class="platform-tag">${platform}</span>`).join('')}
+                        </div>` : ''}
+                        <p>${content.description.substring(0, 100)}...</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         // โหลดข้อมูลเมื่อหน้าเว็บโหลดเสร็จ
         document.addEventListener('DOMContentLoaded', loadContents);
 
-        // ในส่วน script ของไฟล์ main2.html
-document.addEventListener('DOMContentLoaded', function() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    const userRole = localStorage.getItem('userRole');
-    const userSection = document.getElementById('userSection');
-    const usernameDisplay = document.getElementById('usernameDisplay');
-    
-    if (isLoggedIn) {
-        // แสดงส่วนผู้ใช้
-        userSection.style.display = 'flex';
-        
-        // ดึงข้อมูลผู้ใช้จาก Firestore
-        const userId = localStorage.getItem('userId');
-        if (userId) {
-            db.collection('users').doc(userId).get().then((doc) => {
-                if (doc.exists) {
-                    const userData = doc.data();
-                    usernameDisplay.textContent = userData.username || userData.email;
-                }
-            });
+        // ฟังก์ชันแสดง Popup
+        function showPopup(title, rating, description, image, platforms, date) {
+            const popup = document.getElementById('popupOverlay');
+            document.getElementById('popupTitle').textContent = title;
+            document.getElementById('popupDescription').textContent = description;
+            document.getElementById('popupImage').src = image;
+            document.getElementById('popupDate').textContent = new Date(date).toLocaleDateString('th-TH');
+            
+            const ratingElement = document.getElementById('popupRating');
+            if (rating) {
+                ratingElement.textContent = rating;
+                ratingElement.style.display = 'inline-block';
+                document.getElementById('buyLink').style.display = 'inline-block';
+            } else {
+                ratingElement.style.display = 'none';
+                document.getElementById('buyLink').style.display = 'none';
+            }
+            
+            popup.classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
         
-        // ตรวจสอบบทบาท admin
-        const adminLinks = document.querySelectorAll('a[href="commant.html"]');
-        adminLinks.forEach(link => {
-            if (!isLoggedIn || userRole !== 'admin') {
-                link.style.display = 'none';
-            } else {
-                link.style.display = 'inline-flex';
+        // ฟังก์ชันปิด Popup
+        function closePopup() {
+            document.getElementById('popupOverlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // ปิด Popup เมื่อกดปุ่ม Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePopup();
             }
         });
-    }
-    
-        // ตรวจสอบสถานะการล็อกอินและแสดงข้อมูลผู้ใช้
-        document.addEventListener('DOMContentLoaded', function() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const userRole = localStorage.getItem('userRole');
-            const userSection = document.getElementById('userSection');
-            const usernameDisplay = document.getElementById('usernameDisplay');
-            const adminLink = document.querySelector('a[href="commant.html"]');
-            
-            if (isLoggedIn) {
-                // แสดงส่วนผู้ใช้
-                userSection.style.display = 'flex';
-                
-                // ตั้งค่าชื่อผู้ใช้
-                if (userRole === 'guest') {
-                    usernameDisplay.textContent = 'ผู้เยี่ยมชม';
-                } else {
-                    // ดึงข้อมูลผู้ใช้จาก Firestore สำหรับผู้ใช้ที่ลงทะเบียน
-                    const userId = localStorage.getItem('userId');
-                    if (userId) {
-                        db.collection('users').doc(userId).get().then((doc) => {
-                            if (doc.exists) {
-                                const userData = doc.data();
-                                usernameDisplay.textContent = userData.username || userData.email;
-                            }
-                        });
-                    }
-                }
-                
-                // ตรวจสอบบทบาท admin
-                if (userRole === 'admin') {
-                    document.querySelectorAll('a[href="commant.html"]').forEach(link => {
-                        link.style.display = 'inline-flex';
-                    });
-                    document.querySelector('.nav-links a[href="commant.html"]').parentElement.style.display = 'block';
-                }
-            }
-            
-            // ปุ่มออกจากระบบ
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function() {
-                    auth.signOut().then(() => {
-                        localStorage.removeItem('isLoggedIn');
-                        localStorage.removeItem('userRole');
-                        localStorage.removeItem('userId');
-                        window.location.href = 'Login.html';
-                    });
-                });
-            }
-        });
-});
     </script>
 </body>
 </html>
