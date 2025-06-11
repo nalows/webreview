@@ -643,10 +643,9 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="contentImageUrl" class="form-label">URL รูปภาพประกอบ</label>
-                        <input type="text" id="contentImageUrl" class="form-control" placeholder="วาง URL รูปภาพที่นี่ (เช่น จาก Imgur)">
-                        <small>แนะนำให้ใช้บริการโฮสต์รูปภาพฟรีเช่น <a href="https://imgur.com/" target="_blank">Imgur</a></small>
-                        <img id="imagePreview" class="image-preview" alt="Preview" style="display: none;">
+                        <label for="contentImage" class="form-label">รูปภาพประกอบ</label>
+                        <input type="file" id="contentImage" class="form-control" accept="image/*">
+                        <img id="imagePreview" class="image-preview" alt="Preview">
                     </div>
                     
                     <div class="form-group">
@@ -709,18 +708,6 @@
                 appId: "1:639370022712:web:50fea21bd2c26631dd3bcd",
                 measurementId: "G-B29PMGT2XL"
             };
-                // แสดงตัวอย่างภาพจาก URL
-            document.getElementById('contentImageUrl').addEventListener('input', function() {
-                const url = this.value.trim();
-                const preview = document.getElementById('imagePreview');
-        
-                if (url) {
-                    preview.src = url;
-                    preview.style.display = 'block';
-                } else {
-                    preview.style.display = 'none';
-                }
-            });
     
             // Initialize Firebase
             const app = firebase.initializeApp(firebaseConfig);
@@ -801,16 +788,25 @@
                 const rating = type === 'review' ? document.getElementById('contentRating').value : null;
                 
                 try {
+                    let imageUrl = '';
+                    
+                    // อัพโหลดรูปภาพหากมี
+                    if (currentImageFile) {
+                        const storageRef = storage.ref(`content-images/${currentImageFile.name}`);
+                        const snapshot = await storageRef.put(currentImageFile);
+                        imageUrl = await snapshot.ref.getDownloadURL();
+                    }
+                    
                     const contentData = {
                         type,
                         title,
                         description,
                         tags,
-                        platforms: platforms || [],
+                        platforms,
                         rating,
-                        image: imageUrl || '', // ใช้ URL ที่ผู้ใช้ป้อนเข้ามา
+                        image: imageUrl,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        createdBy: auth.currentUser.uid,
+                        createdBy: localStorage.getItem('userId'),
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     
