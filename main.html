@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameReviewTH - รีวิวเกมและเนื้อหาเกี่ยวกับเกม</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --accent-color: #ff4d4d;
+            --text-color: #2d3436;
+            --light-color: #f9f9f9;
+            --dark-color: #1e272e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: linear-gradient(135deg, var(--light-color), #e0e0e0);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+            animation: shine 8s infinite linear;
+        }
+        
+        @keyframes shine {
+            0% { transform: rotate(30deg) translate(-10%, -10%); }
+            100% { transform: rotate(30deg) translate(10%, 10%); }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            margin-bottom: 1rem;
+            transition: transform 0.3s;
+        }
+        
+        .profile-img:hover {
+            transform: scale(1.05);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .social-links a:hover {
+            transform: translateY(-5px);
+            color: var(--accent-color);
+        }
+        
+        nav {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-color);
+            transition: width 0.3s;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background-color: #ff3333;
+            transform: translateY(-2px);
+        }
+        
+        section {
+            padding: 4rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            margin: 0.5rem auto 0;
+            border-radius: 2px;
+        }
+        
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+        }
+        
+        .about-text {
+            flex: 1;
+        }
+        
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+        
+        .skill-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            width: calc(33% - 1rem);
+            min-width: 250px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .skill-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .skill-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+            position: relative;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .game-rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            z-index: 1;
+        }
+        
+        .game-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .game-info {
+            padding: 1.5rem;
+        }
+        
+        .game-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .game-platforms {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .platform-tag {
+            background-color: #f1f2f6;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .game-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .game-links a {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .game-links a:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Popup Styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .popup-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+        
+        .popup-overlay.active .popup-content {
+            transform: translateY(0);
+        }
+        
+        .popup-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--accent-color);
+        }
+        
+        .popup-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .popup-title {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .popup-rating {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        
+        .popup-description {
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .popup-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+        }
+        
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .nav-button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .about-content {
+                flex-direction: column;
+            }
+            
+            .skill-card {
+                width: 100%;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .popup-content {
+                padding: 1.5rem;
+            }
+            
+            .popup-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <img src="C:\Users\ASUS\Desktop\game-review-th\asssets\me2.jpg" alt="Profile Image" class="profile-img">
+            <h1>ทีมรีวิวเกม GameReviewTH</h1>
+            <p class="tagline">รีวิวเกมอย่างตรงไปตรงมาโดยนักเล่นเกมตัวจริง</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+                <a href="#"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-twitch"></i></a>
+            </div>
+        </div>
+    </header>
+    
+    <nav>
+        <div class="container nav-container">
+            <div class="logo">GRT</div>
+            <ul class="nav-links">
+                <li><a href="#about">เกี่ยวกับเรา</a></li>
+                <li><a href="#reviews">รีวิวเกม</a></li>
+                <li><a href="#guides">ไกด์และบทความ</a></li>
+                <li><a href="main2.html">บทความทั้งหมด</a></li>
+                <li style="display: none;"><a href="commant.html">จัดการเนื้อหา</a></li>
+            </ul>
+            <div class="user-section" id="userSection" style="display: none;">
+                <span id="usernameDisplay" style="margin-right: 1rem;"></span>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section id="about">
+        <div class="container">
+            <h2 class="section-title">เกี่ยวกับเรา</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>สวัสดีครับ! เราคือทีม GameReviewTH ผู้ที่หลงใหลในโลกของเกมและต้องการแบ่งปันประสบการณ์การเล่นเกมอย่างตรงไปตรงมา เรารีวิวเกมทุกประเภททั้งเกมใหม่และเกมคลาสสิค โดยเน้นที่ความสนุกและประสบการณ์การเล่นจริง</p>
+                    <br>
+                    <p>ทีมงานของเราประกอบด้วยนักเล่นเกมที่มีประสบการณ์มากว่า 10 ปีในวงการเกม เรามีความเชี่ยวชาญในหลายแพลตฟอร์มทั้ง PC, Console และ Mobile</p>
+                    <br>
+                    <p>นอกจากรีวิวเกมแล้ว เรายังมีบทความเกี่ยวกับเทคนิคการเล่นเกม ข่าวสารวงการเกม และเนื้อหาอื่นๆ ที่น่าสนใจสำหรับนักเล่นเกมทุกคน</p>
+                </div>
+                <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="About Image" style="border-radius: 10px; max-width: 400px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="nav-buttons">
+                <a href="#reviews" class="nav-button">
+                    <i class="fas fa-star"></i> รีวิวเกม
+                </a>
+                <a href="#guides" class="nav-button">
+                    <i class="fas fa-book"></i> บทความแนะนำ
+                </a>
+                <a href="main2.html" class="nav-button">
+                    <i class="fas fa-list"></i> ดูบทความทั้งหมด
+                </a>
+                <a href="commant.html" class="nav-button" style="background-color: var(--accent); display: none;">
+                    <i class="fas fa-plus"></i> เพิ่มเนื้อหา (Admin)
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <section id="reviews" style="background-color: #f5f7fa;">
+        <div class="container">
+            <h2 class="section-title">รีวิวเกมล่าสุด</h2>
+            <div class="games-grid">
+                <div class="game-card" onclick="showPopup('Elden Ring', '9.5/10', 'Elden Ring เป็นเกมที่ผสมผสานระหว่างความยากของเกม Souls กับโลกเปิดที่กว้างใหญ่และเต็มไปด้วยความลับ นี่คือรีวิวฉบับเต็มของเกมที่อาจจะดีที่สุดในปีนี้', 'https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80', ['PS5', 'Xbox', 'PC'], '2023-03-15')">
+                    <div class="game-rating">9.5/10</div>
+                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Game 1" class="game-img">
+                    <div class="game-info">
+                        <h3 class="game-title">Elden Ring</h3>
+                        <div class="game-platforms">
+                            <span class="platform-tag">PS5</span>
+                            <span class="platform-tag">Xbox</span>
+                            <span class="platform-tag">PC</span>
+                        </div>
+                        <p>เกมโอเพนเวิลด์ที่สมบูรณ์แบบจาก FromSoftware ด้วยโลกที่กว้างใหญ่และเต็มไปด้วยความลับ</p>
+                    </div>
+                </div>
+                <div class="game-card" onclick="showPopup('Horizon Forbidden West', '8.7/10', 'Horizon Forbidden West พัฒนาทุกอย่างจากภาคแรกให้ดียิ่งขึ้น ทั้งกราฟิก ระบบต่อสู้ และเนื้อเรื่องที่น่าสนใจ', 'https://images.unsplash.com/photo-1607853202273-797f1c22a38e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80', ['PS5', 'PS4'], '2023-02-20')">
+                    <div class="game-rating">8.7/10</div>
+                    <img src="https://images.unsplash.com/photo-1607853202273-797f1c22a38e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Game 2" class="game-img">
+                    <div class="game-info">
+                        <h3 class="game-title">Horizon Forbidden West</h3>
+                        <div class="game-platforms">
+                            <span class="platform-tag">PS5</span>
+                            <span class="platform-tag">PS4</span>
+                        </div>
+                        <p>ภาคต่อของ Horizon Zero Dawn ที่พัฒนาทุกอย่างให้ดียิ่งขึ้นทั้งกราฟิกและระบบเกมเพลย์</p>
+                    </div>
+                </div>
+                <div class="game-card" onclick="showPopup('The Legend of Zelda: Tears of the Kingdom', '9.0/10', 'เกมแอคชั่นผจญภัยที่ยกระดับทุกอย่างจาก Breath of the Wild ด้วยระบบใหม่ที่น่าตื่นตาตื่นใจ', 'https://images.unsplash.com/photo-1587840171670-8b850147754e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80', ['Nintendo Switch'], '2023-05-12')">
+                    <div class="game-rating">9.0/10</div>
+                    <img src="https://images.unsplash.com/photo-1587840171670-8b850147754e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Game 3" class="game-img">
+                    <div class="game-info">
+                        <h3 class="game-title">The Legend of Zelda: Tears of the Kingdom</h3>
+                        <div class="game-platforms">
+                            <span class="platform-tag">Nintendo Switch</span>
+                        </div>
+                        <p>เกมแอคชั่นผจญภัยที่ยกระดับทุกอย่างจาก Breath of the Wild ด้วยระบบใหม่ที่น่าตื่นตาตื่นใจ</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="guides">
+        <div class="container">
+            <h2 class="section-title">ไกด์และบทความ</h2>
+            <div class="games-grid">
+                <div class="game-card" onclick="showPopup('10 เกมเปิดตัวปี 2023 ที่น่าจับตามอง', null, 'รวมเกมใหม่ที่น่าติดตามในปีนี้ ทั้งเกม AAA และอินดี้ที่น่าสนใจจากทุกแพลตฟอร์ม', 'https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80', null, '2023-01-10')">
+                    <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Guide 1" class="game-img">
+                    <div class="game-info">
+                        <h3 class="game-title">10 เกมเปิดตัวปี 2023 ที่น่าจับตามอง</h3>
+                        <p>รวมเกมใหม่ที่น่าติดตามในปีนี้ ทั้งเกม AAA และอินดี้ที่น่าสนใจ</p>
+                    </div>
+                </div>
+                <div class="game-card" onclick="showPopup('เทคนิคการเล่น Valorant สำหรับมือใหม่', null, 'เรียนรู้พื้นฐานและเทคนิคสำคัญที่จะช่วยให้คุณเล่น Valorant ได้ดีขึ้น', 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80', null, '2023-02-15')">
+                    <img src="https://images.unsplash.com/photo-1547036967-23d11aacaee0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Guide 2" class="game-img">
+                    <div class="game-info">
+                        <h3 class="game-title">เทคนิคการเล่น Valorant สำหรับมือใหม่</h3>
+                        <p>เรียนรู้พื้นฐานและเทคนิคสำคัญที่จะช่วยให้คุณเล่น Valorant ได้ดีขึ้น</p>
+                    </div>
+                </div>
+                <div class="game-card" onclick="showPopup('เปรียบเทียบ PS5 vs Xbox Series X', null, 'วิเคราะห์จุดแข็งจุดอ่อนของคอนโซลรุ่นใหม่จาก Sony และ Microsoft', 'https://images.unsplash.com/photo-1551103782-8ab07afd45c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80', null, '2023-03-01')">
+                    <img src="https://images.unsplash.com/photo-1551103782-8ab07afd45c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Guide 3" class="game-img">
+                    <div class="game-info">
+                        <h3 class="game-title">เปรียบเทียบ PS5 vs Xbox Series X</h3>
+                        <p>วิเคราะห์จุดแข็งจุดอ่อนของคอนโซลรุ่นใหม่จาก Sony และ Microsoft</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popup Overlay -->
+    <div class="popup-overlay" id="popupOverlay" onclick="closePopup()">
+        <div class="popup-content" onclick="event.stopPropagation()">
+            <span class="popup-close" onclick="closePopup()">&times;</span>
+            <img src="" alt="Popup Image" class="popup-image" id="popupImage">
+            <h2 class="popup-title" id="popupTitle"></h2>
+            <div class="popup-rating" id="popupRating" style="display: none;"></div>
+            <p class="popup-description" id="popupDescription"></p>
+            <div class="popup-meta">
+                <span id="popupDate"></span>
+            </div>
+            <div class="game-links">
+                <a href="#" id="buyLink" style="display: none;">
+                    <i class="fas fa-shopping-cart"></i> ซื้อเกม
+                </a>
+                <a href="main2.html">
+                    <i class="fas fa-list"></i> ดูบทความทั้งหมด
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 GameReviewTH. สงวนลิขสิทธิ์.</p>
+            <div class="social-links" style="margin-top: 1rem;">
+                <a href="https://www.facebook.com/aud.pang?locale=th_TH"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+                <a href="#"><i class="fab fa-discord"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBH_El7Vs4Xl6thuWfzj-3lj7hjSX9bNxU",
+            authDomain: "websidereview.firebaseapp.com",
+            projectId: "websidereview",
+            storageBucket: "websidereview.appspot.com",
+            messagingSenderId: "639370022712",
+            appId: "1:639370022712:web:50fea21bd2c26631dd3bcd",
+            measurementId: "G-B29PMGT2XL"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ตรวจสอบสถานะการล็อกอินและแสดงข้อมูลผู้ใช้
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const userRole = localStorage.getItem('userRole');
+            const userSection = document.getElementById('userSection');
+            const usernameDisplay = document.getElementById('usernameDisplay');
+            const adminLink = document.querySelector('a[href="commant.html"]');
+            
+            if (isLoggedIn) {
+                // แสดงส่วนผู้ใช้
+                userSection.style.display = 'flex';
+                
+                // ตั้งค่าชื่อผู้ใช้
+                if (userRole === 'guest') {
+                    usernameDisplay.textContent = 'ผู้เยี่ยมชม';
+                } else {
+                    // ดึงข้อมูลผู้ใช้จาก Firestore สำหรับผู้ใช้ที่ลงทะเบียน
+                    const userId = localStorage.getItem('userId');
+                    if (userId) {
+                        db.collection('users').doc(userId).get().then((doc) => {
+                            if (doc.exists) {
+                                const userData = doc.data();
+                                usernameDisplay.textContent = userData.username || userData.email;
+                            }
+                        });
+                    }
+                }
+                
+                // ตรวจสอบบทบาท admin
+                if (userRole === 'admin') {
+                    document.querySelectorAll('a[href="commant.html"]').forEach(link => {
+                        link.style.display = 'inline-flex';
+                    });
+                    document.querySelector('.nav-links a[href="commant.html"]').parentElement.style.display = 'block';
+                }
+            }
+            
+            // ปุ่มออกจากระบบ
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    auth.signOut().then(() => {
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('userRole');
+                        localStorage.removeItem('userId');
+                        window.location.href = 'Login.html';
+                    });
+                });
+            }
+        });
+
+        // ฟังก์ชันแสดง Popup
+        function showPopup(title, rating, description, image, platforms, date) {
+            const popup = document.getElementById('popupOverlay');
+            document.getElementById('popupTitle').textContent = title;
+            document.getElementById('popupDescription').textContent = description;
+            document.getElementById('popupImage').src = image;
+            document.getElementById('popupDate').textContent = new Date(date).toLocaleDateString('th-TH');
+            
+            const ratingElement = document.getElementById('popupRating');
+            if (rating) {
+                ratingElement.textContent = rating;
+                ratingElement.style.display = 'inline-block';
+                document.getElementById('buyLink').style.display = 'inline-block';
+            } else {
+                ratingElement.style.display = 'none';
+                document.getElementById('buyLink').style.display = 'none';
+            }
+            
+            const platformsContainer = document.getElementById('popupPlatforms');
+            platformsContainer.innerHTML = '';
+            if (platforms && platforms.length > 0) {
+                platforms.forEach(platform => {
+                    const tag = document.createElement('span');
+                    tag.className = 'platform-tag';
+                    tag.textContent = platform;
+                    platformsContainer.appendChild(tag);
+                });
+            }
+            
+            popup.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // ฟังก์ชันปิด Popup
+        function closePopup() {
+            document.getElementById('popupOverlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // ปิด Popup เมื่อกดปุ่ม Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePopup();
+            }
+        });
+    </script>
+</body>
+</html>
