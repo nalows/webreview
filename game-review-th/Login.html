@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ | GameReviewTH</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff4d4d;
+            --dark: #1e272e;
+            --light: #f8fafc;
+            --gray: #64748b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .logo {
+            margin-bottom: 30px;
+        }
+        
+        .logo i {
+            font-size: 3rem;
+            color: var(--primary);
+        }
+        
+        .logo h1 {
+            color: var(--dark);
+            margin-top: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .input-field {
+            position: relative;
+        }
+        
+        .input-field input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .input-field input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+        }
+        
+        .input-field i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+        
+        .login-btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+        
+        .guest-btn {
+            background: var(--dark);
+            margin-top: 15px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .forgot-password {
+            display: block;
+            margin-top: 20px;
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .forgot-password:hover {
+            color: var(--primary);
+        }
+        
+        .error-message {
+            color: var(--accent);
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .register-container {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <i class="fas fa-gamepad"></i>
+            <h1>GameReviewTH</h1>
+        </div>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">อีเมล</label>
+                <div class="input-field">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="กรอกอีเมล" required>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="password">รหัสผ่าน</label>
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="กรอกรหัสผ่าน" required>
+                </div>
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง
+            </div>
+            
+            <button type="submit" class="btn login-btn">
+                <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ
+            </button>
+            
+            <a href="#" class="btn guest-btn" id="guestLoginBtn">
+                <i class="fas fa-user"></i> เข้าสู่ระบบในฐานะผู้เยี่ยมชม
+            </a>
+            
+            <div style="margin-top: 1.5rem; text-align: center;">
+                <a href="#" class="forgot-password">ลืมรหัสผ่าน?</a>
+                <span style="color: var(--gray); margin: 0 0.5rem;">|</span>
+                <a href="#" class="forgot-password" id="showRegisterLink">สมัครสมาชิก</a>
+            </div>
+        </form>
+        
+        <form id="registerForm" class="register-container">
+            <div class="input-group">
+                <label for="registerEmail">อีเมล</label>
+                <div class="input-field">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="registerEmail" placeholder="กรอกอีเมล" required>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="registerPassword">รหัสผ่าน</label>
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="registerPassword" placeholder="กรอกรหัสผ่าน (อย่างน้อย 6 ตัวอักษร)" required minlength="6">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="registerUsername">ชื่อผู้ใช้</label>
+                <div class="input-field">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="registerUsername" placeholder="กรอกชื่อผู้ใช้" required>
+                </div>
+            </div>
+            
+            <div class="error-message" id="registerErrorMessage">
+                เกิดข้อผิดพลาดในการสมัครสมาชิก
+            </div>
+            
+            <button type="submit" class="btn login-btn">
+                <i class="fas fa-user-plus"></i> สมัครสมาชิก
+            </button>
+            
+            <a href="#" class="forgot-password" id="showLoginLink" style="display: block; margin-top: 1rem;">
+                <i class="fas fa-arrow-left"></i> กลับไปหน้าเข้าสู่ระบบ
+            </a>
+        </form>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBH_El7Vs4Xl6thuWfzj-3lj7hjSX9bNxU",
+            authDomain: "websidereview.firebaseapp.com",
+            projectId: "websidereview",
+            storageBucket: "websidereview.appspot.com",
+            messagingSenderId: "639370022712",
+            appId: "1:639370022712:web:50fea21bd2c26631dd3bcd",
+            measurementId: "G-B29PMGT2XL"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ตรวจสอบสถานะการล็อกอิน
+        auth.onAuthStateChanged((user) => {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (isLoggedIn) {
+                const userRole = localStorage.getItem('userRole');
+                if (userRole === 'admin') {
+                    window.location.href = 'commant.html';
+                } else {
+                    window.location.href = 'main.html';
+                }
+            }
+        });
+
+        // ฟังก์ชันแสดงข้อความผิดพลาด
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // ฟังก์ชันเข้าสู่ระบบในฐานะผู้เยี่ยมชม
+        document.getElementById('guestLoginBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userRole', 'guest');
+            window.location.href = 'main.html';
+        });
+
+        // ฟังก์ชันเข้าสู่ระบบ
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // ตรวจสอบบัญชี Admin
+                if (email === 'admin@admin.com') {
+                    try {
+                        await db.collection('users').doc(user.uid).set({
+                            email: user.email,
+                            username: 'Admin',
+                            role: 'admin',
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                        
+                        localStorage.setItem('isLoggedIn', 'true');
+                        localStorage.setItem('userRole', 'admin');
+                        localStorage.setItem('userId', user.uid);
+                        window.location.href = 'commant.html';
+                        return;
+                    } catch (error) {
+                        console.error('Error setting admin data:', error);
+                        // Fall through to regular user handling
+                    }
+                }
+                
+                // สำหรับผู้ใช้ทั่วไป
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    
+                    if (!userDoc.exists) {
+                        // สร้างข้อมูลผู้ใช้ใหม่ถ้ายังไม่มี
+                        await db.collection('users').doc(user.uid).set({
+                            email: user.email,
+                            username: user.email.split('@')[0],
+                            role: 'user',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } else {
+                        // อัปเดตเวลาล็อกอินล่าสุด
+                        await db.collection('users').doc(user.uid).update({
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                    
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userRole', 'user');
+                    localStorage.setItem('userId', user.uid);
+                    window.location.href = 'main.html';
+                    
+                } catch (error) {
+                    console.error('Error accessing user data:', error);
+                    // ถ้าไม่สามารถเข้าถึง Firestore ได้ แต่ล็อกอินสำเร็จ
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userRole', 'user');
+                    localStorage.setItem('userId', user.uid);
+                    window.location.href = 'main.html';
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                // แสดงข้อความผิดพลาด
+                let errorMessageText = 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ';
+                switch (error.code) {
+                    case 'auth/invalid-email':
+                        errorMessageText = 'รูปแบบอีเมลไม่ถูกต้อง';
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessageText = 'บัญชีนี้ถูกระงับการใช้งาน';
+                        break;
+                    case 'auth/user-not-found':
+                        errorMessageText = 'ไม่พบผู้ใช้งานนี้';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessageText = 'รหัสผ่านไม่ถูกต้อง';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessageText = 'พยายามล็อกอินหลายครั้งเกินไป กรุณารอสักครู่';
+                        break;
+                    default:
+                        errorMessageText = error.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ';
+                }
+                
+                showError(errorMessage, errorMessageText);
+            }
+        });
+
+        // ฟังก์ชันสมัครสมาชิก
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const username = document.getElementById('registerUsername').value;
+            const errorMessage = document.getElementById('registerErrorMessage');
+            
+            try {
+                // ตรวจสอบข้อมูลก่อนสมัคร
+                if (!email || !password || !username) {
+                    throw new Error('กรุณากรอกข้อมูลให้ครบถ้วน');
+                }
+                
+                if (password.length < 6) {
+                    throw new Error('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
+                }
+
+                // สร้างบัญชีผู้ใช้ใหม่
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // บันทึกข้อมูลผู้ใช้เพิ่มเติม
+                await db.collection('users').doc(user.uid).set({
+                    email: user.email,
+                    username: username,
+                    role: 'user',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                alert('สมัครสมาชิกสำเร็จ! คุณสามารถเข้าสู่ระบบได้ทันที');
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('registerForm').reset();
+
+            } catch (error) {
+                console.error('Registration error:', error);
+                
+                // แปลงข้อความผิดพลาดเป็นภาษาไทย
+                let errorMessageText = 'เกิดข้อผิดพลาดในการสมัครสมาชิก';
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessageText = 'อีเมลนี้ถูกใช้งานแล้ว';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessageText = 'รูปแบบอีเมลไม่ถูกต้อง';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessageText = 'รหัสผ่านไม่แข็งแรงพอ';
+                        break;
+                    default:
+                        errorMessageText = error.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก';
+                }
+                
+                showError(errorMessage, errorMessageText);
+            }
+        });
+
+        // สลับระหว่างฟอร์มเข้าสู่ระบบและสมัครสมาชิก
+        document.getElementById('showRegisterLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        });
+        
+        document.getElementById('showLoginLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
