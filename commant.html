@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบจัดการเนื้อหา | GameReviewTH</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
     <style>
         :root {
             --primary: #6a11cb;
@@ -16,8 +12,8 @@
             --accent: #ff4d4d;
             --dark: #1e272e;
             --light: #f8fafc;
-            --danger: #dc2626;
             --success: #10b981;
+            --danger: #dc2626;
             --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
         }
@@ -247,32 +243,21 @@
             margin-top: 1rem;
         }
         
-        /* Navigation Buttons */
-        .nav-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
         
-        .nav-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background-color: var(--primary);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .nav-button:hover {
-            background-color: var(--secondary);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         @media (max-width: 768px) {
@@ -297,260 +282,6 @@
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
-<script>
-    // ระบบจัดการเนื้อหา
-    document.addEventListener('DOMContentLoaded', function() {
-        // กำหนดค่า Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBH_El7Vs4Xl6thuWfzj-3lj7hjSX9bNxU",
-            authDomain: "websidereview.firebaseapp.com",
-            projectId: "websidereview",
-            storageBucket: "websidereview.appspot.com",
-            messagingSenderId: "639370022712",
-            appId: "1:639370022712:web:50fea21bd2c26631dd3bcd",
-            measurementId: "G-B29PMGT2XL"
-        };
-
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
-
-        // ตรวจสอบการล็อกอิน
-        auth.onAuthStateChanged((user) => {
-            if (!user) {
-                window.location.href = 'Login.html';
-            } else {
-                // ตรวจสอบบทบาทผู้ใช้
-                db.collection('users').doc(user.uid).get().then((doc) => {
-                    if (doc.exists && doc.data().role !== 'admin') {
-                        window.location.href = 'main.html';
-                    }
-                });
-            }
-        });
-
-        let currentEditId = null;
-        let currentImageFile = null;
-
-        // แสดง/ซ่อนฟิลด์คะแนน
-        document.getElementById('contentType').addEventListener('change', function() {
-            document.getElementById('ratingField').style.display = 
-                this.value === 'review' ? 'block' : 'none';
-        });
-
-        // แสดงตัวอย่างภาพ
-        document.getElementById('contentImage').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                currentImageFile = file;
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const preview = document.getElementById('imagePreview');
-                    preview.src = event.target.result;
-                    preview.style.display = 'block';
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // บันทึกเนื้อหา
-        document.getElementById('contentForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const type = document.getElementById('contentType').value;
-            const title = document.getElementById('contentTitle').value;
-            const description = document.getElementById('contentDescription').value;
-            const tags = document.getElementById('contentTags').value.split(',').map(tag => tag.trim());
-            const platforms = document.getElementById('contentPlatforms').value.split(',').map(platform => platform.trim());
-            const rating = type === 'review' ? document.getElementById('contentRating').value : null;
-            
-            try {
-                let imageUrl = '';
-
-                // อัพโหลดรูปภาพ
-        if (currentImageFile) {
-            try {
-                const storageRef = storage.ref(`content-images/${Date.now()}_${currentImageFile.name}`);
-                const uploadTask = storageRef.put(currentImageFile);
-        
-                uploadTask.on('state_changed', 
-                    (snapshot) => {
-                // Progress tracking if needed
-                    },
-                    (error) => {
-                        console.error('Upload error:', error);
-                        alert('อัพโหลดรูปภาพล้มเหลว: ' + error.message);
-                    },
-                    async () => {
-                        imageUrl = await uploadTask.snapshot.ref.getDownloadURL();
-                // Continue with your content saving logic
-                    }
-                );
-    } catch (error) {
-        console.error('Upload error:', error);
-        alert('เกิดข้อผิดพลาดในการอัพโหลด: ' + error.message);
-    }
-}
-                
-                // อัพโหลดรูปภาพ
-                if (currentImageFile) {
-                    const storageRef = storage.ref(`content-images/${currentImageFile.name}`);
-                    const snapshot = await storageRef.put(currentImageFile);
-                    imageUrl = await snapshot.ref.getDownloadURL();
-                }
-                
-                const contentData = {
-                    type,
-                    title,
-                    description,
-                    tags,
-                    platforms: platforms || [],
-                    rating,
-                    image: imageUrl,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    createdBy: auth.currentUser.uid,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                if (currentEditId) {
-                    await db.collection('contents').doc(currentEditId).update(contentData);
-                    alert('อัปเดตเนื้อหาเรียบร้อยแล้ว!');
-                } else {
-                    await db.collection('contents').add(contentData);
-                    alert('บันทึกเนื้อหาเรียบร้อยแล้ว!');
-                }
-                
-                resetForm();
-                loadContents();
-            } catch (error) {
-                console.error('Error:', error);
-                alert('เกิดข้อผิดพลาด: ' + error.message);
-            }
-        });
-
-        // โหลดเนื้อหา
-        async function loadContents() {
-            try {
-                const snapshot = await db.collection('contents')
-                    .orderBy('createdAt', 'desc')
-                    .limit(6)
-                    .get();
-                
-                const contents = [];
-                snapshot.forEach(doc => {
-                    contents.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
-                });
-                
-                renderContents(contents);
-            } catch (error) {
-                console.error('Error loading contents:', error);
-            }
-        }
-
-        // แสดงเนื้อหา
-        function renderContents(contents) {
-            const container = document.getElementById('latestContent');
-            container.innerHTML = contents.map(content => `
-                <div class="news-item">
-                    ${content.image ? `<img src="${content.image}" class="news-image" alt="${content.title}">` : ''}
-                    <div class="news-content">
-                        <h3 class="news-title">${content.title}</h3>
-                        <p>${content.description.substring(0, 100)}...</p>
-                        <div class="news-meta">
-                            <span>${new Date(content.createdAt?.seconds * 1000).toLocaleDateString('th-TH')}</span>
-                            <span>${getTypeName(content.type)}</span>
-                        </div>
-                        <div class="action-btns">
-                            <button class="btn" onclick="editContent('${content.id}')">
-                                <i class="fas fa-edit"></i> แก้ไข
-                            </button>
-                            <button class="btn btn-danger" onclick="deleteContent('${content.id}')">
-                                <i class="fas fa-trash"></i> ลบ
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // แก้ไขเนื้อหา
-        window.editContent = async function(id) {
-            try {
-                const doc = await db.collection('contents').doc(id).get();
-                if (!doc.exists) return;
-                
-                const content = doc.data();
-                currentEditId = doc.id;
-                
-                // เติมข้อมูลในฟอร์ม
-                document.getElementById('contentType').value = content.type;
-                document.getElementById('contentTitle').value = content.title;
-                document.getElementById('contentDescription').value = content.description;
-                document.getElementById('contentTags').value = content.tags.join(', ');
-                document.getElementById('contentPlatforms').value = content.platforms.join(', ');
-                
-                if (content.type === 'review') {
-                    document.getElementById('ratingField').style.display = 'block';
-                    document.getElementById('contentRating').value = content.rating;
-                }
-                
-                if (content.image) {
-                    document.getElementById('imagePreview').src = content.image;
-                    document.getElementById('imagePreview').style.display = 'block';
-                }
-                
-                document.getElementById('submitBtn').style.display = 'none';
-                document.getElementById('updateBtn').style.display = 'inline-block';
-                document.getElementById('cancelBtn').style.display = 'inline-block';
-            } catch (error) {
-                console.error('Error editing content:', error);
-            }
-        };
-
-        // ลบเนื้อหา
-        window.deleteContent = async function(id) {
-            if (confirm('แน่ใจหรือไม่ว่าต้องการลบเนื้อหานี้?')) {
-                try {
-                    await db.collection('contents').doc(id).delete();
-                    loadContents();
-                } catch (error) {
-                    console.error('Error deleting content:', error);
-                }
-            }
-        };
-
-        // รีเซ็ตฟอร์ม
-        function resetForm() {
-            document.getElementById('contentForm').reset();
-            document.getElementById('imagePreview').style.display = 'none';
-            document.getElementById('ratingField').style.display = 'none';
-            document.getElementById('submitBtn').style.display = 'inline-block';
-            document.getElementById('updateBtn').style.display = 'none';
-            document.getElementById('cancelBtn').style.display = 'none';
-            currentEditId = null;
-            currentImageFile = null;
-        }
-
-        // เริ่มต้นโหลดข้อมูล
-        loadContents();
-    });
-
-    function getTypeName(type) {
-        const types = {
-            'review': 'รีวิวเกม',
-            'article': 'บทความ',
-            'news': 'ข่าวสาร'
-        };
-        return types[type] || type;
-    }
-</script>
-
 
 <body>
     <div class="dashboard">
@@ -579,12 +310,6 @@
                         <span>ดูเนื้อหาทั้งหมด</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-chart-line"></i>
-                        <span>วิเคราะห์ข้อมูล</span>
-                    </a>
-                </li>
                 <div class="user-panel" style="padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
                     <div class="user-info" style="display: flex; align-items: center; gap: 0.75rem;">
                         <div class="user-avatar" style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--accent); display: flex; align-items: center; justify-content: center; color: white;">
@@ -595,7 +320,7 @@
                             <div class="user-role" style="font-size: 0.75rem; opacity: 0.8;">Admin</div>
                         </div>
                     </div>
-                    <a href="#" class="btn logout-btn" style="background-color: var(--danger);">
+                    <a href="#" class="btn logout-btn" style="background-color: var(--danger); margin-top: 1rem;">
                         <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
                     </a>
                 </div>
@@ -643,8 +368,9 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="contentImage" class="form-label">รูปภาพประกอบ</label>
-                        <input type="file" id="contentImage" class="form-control" accept="image/*">
+                        <label for="contentImageUrl" class="form-label">URL รูปภาพประกอบ</label>
+                        <input type="text" id="contentImageUrl" class="form-control" placeholder="วาง URL รูปภาพที่นี่ (เช่น จาก Imgur)">
+                        <small>แนะนำให้ใช้บริการโฮสต์รูปภาพฟรีเช่น <a href="https://imgur.com/" target="_blank">Imgur</a></small>
                         <img id="imagePreview" class="image-preview" alt="Preview">
                     </div>
                     
@@ -667,6 +393,8 @@
                         <label for="contentPlatforms" class="form-label">แพลตฟอร์ม (คั่นด้วยเครื่องหมายจุลภาค, สำหรับรีวิวเกม)</label>
                         <input type="text" id="contentPlatforms" class="form-control" placeholder="ตัวอย่าง: PS5, Xbox, PC">
                     </div>
+                    
+                    <div class="spinner" id="formSpinner"></div>
                     
                     <button type="submit" class="btn btn-success" id="submitBtn">
                         <i class="fas fa-save"></i>
@@ -695,6 +423,11 @@
         </main>
     </div>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
     <script>
         // ระบบจัดการเนื้อหา
         document.addEventListener('DOMContentLoaded', function() {
@@ -708,207 +441,206 @@
                 appId: "1:639370022712:web:50fea21bd2c26631dd3bcd",
                 measurementId: "G-B29PMGT2XL"
             };
-    
+
             // Initialize Firebase
             const app = firebase.initializeApp(firebaseConfig);
             const auth = firebase.auth();
             const db = firebase.firestore();
-            const storage = firebase.storage();
-    
-            // ตรวจสอบการล็อกอินก่อนเข้าถึงหน้า
+
+            // ตรวจสอบว่าองค์ประกอบต่างๆ มีอยู่จริง
+            const contentForm = document.getElementById('contentForm');
+            const contentImageUrl = document.getElementById('contentImageUrl');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const formSpinner = document.getElementById('formSpinner');
+
+            if (!contentForm || !contentImageUrl || !cancelBtn) {
+                console.error('ไม่พบองค์ประกอบที่จำเป็นในหน้าเว็บ');
+                return;
+            }
+
+            // ตรวจสอบการล็อกอิน
             auth.onAuthStateChanged((user) => {
                 if (!user) {
-                    alert('กรุณาเข้าสู่ระบบก่อนเข้าถึงหน้านี้');
+                    alert('กรุณาเข้าสู่ระบบก่อนใช้งาน');
                     window.location.href = 'Login.html';
-                    return;
-                }
-                
-                // ตรวจสอบว่าเป็น admin หรือไม่
-                db.collection('users').doc(user.uid).get().then((doc) => {
-                    if (doc.exists && doc.data().role !== 'admin') {
-                        alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
-                        window.location.href = 'main.html';
-                    }
-                });
-            });
-    
-            // ปุ่มออกจากระบบ
-            const logoutBtn = document.querySelector('.logout-btn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    auth.signOut().then(() => {
-                        localStorage.removeItem('isLoggedIn');
-                        localStorage.removeItem('userId');
-                        localStorage.removeItem('userEmail');
-                        localStorage.removeItem('userRole');
-                        localStorage.removeItem('username');
-                        window.location.href = 'Login.html';
-                    });
-                });
-            }
-    
-            let currentEditId = null;
-            let currentImageFile = null;
-            
-            // แสดง/ซ่อนฟิลด์คะแนนตามประเภทเนื้อหา
-            document.getElementById('contentType').addEventListener('change', function() {
-                const ratingField = document.getElementById('ratingField');
-                if (this.value === 'review') {
-                    ratingField.style.display = 'block';
                 } else {
-                    ratingField.style.display = 'none';
+                    // ตรวจสอบบทบาทผู้ใช้
+                    db.collection('users').doc(user.uid).get().then((doc) => {
+                        if (doc.exists && doc.data().role !== 'admin') {
+                            alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
+                            window.location.href = 'main.html';
+                        } else {
+                            // โหลดเนื้อหาเมื่อยืนยันสิทธิ์แล้ว
+                            loadContents();
+                        }
+                    }).catch(error => {
+                        console.error("Error checking user role:", error);
+                    });
                 }
             });
-            
-            // ฟังก์ชันแสดงตัวอย่างภาพ
-            document.getElementById('contentImage').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    currentImageFile = file;
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const preview = document.getElementById('imagePreview');
-                        preview.src = event.target.result;
-                        preview.style.display = 'block';
-                    }
-                    reader.readAsDataURL(file);
+
+            let currentEditId = null;
+
+            // แสดง/ซ่อนฟิลด์คะแนน
+            document.getElementById('contentType').addEventListener('change', function() {
+                document.getElementById('ratingField').style.display = 
+                    this.value === 'review' ? 'block' : 'none';
+            });
+
+            // แสดงตัวอย่างภาพจาก URL
+            contentImageUrl.addEventListener('input', function() {
+                const url = this.value.trim();
+                const preview = document.getElementById('imagePreview');
+                
+                if (url) {
+                    preview.src = url;
+                    preview.style.display = 'block';
+                } else {
+                    preview.style.display = 'none';
                 }
             });
-            
-            // ฟังก์ชันบันทึกเนื้อหา
-            document.getElementById('contentForm').addEventListener('submit', async function(e) {
+
+            // บันทึกเนื้อหา
+            contentForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
+                // แสดง loading spinner
+                formSpinner.style.display = 'block';
+                document.getElementById('submitBtn').disabled = true;
+                if (document.getElementById('updateBtn')) {
+                    document.getElementById('updateBtn').disabled = true;
+                }
+
                 const type = document.getElementById('contentType').value;
                 const title = document.getElementById('contentTitle').value;
                 const description = document.getElementById('contentDescription').value;
                 const tags = document.getElementById('contentTags').value.split(',').map(tag => tag.trim());
                 const platforms = document.getElementById('contentPlatforms').value.split(',').map(platform => platform.trim());
                 const rating = type === 'review' ? document.getElementById('contentRating').value : null;
+                const imageUrl = contentImageUrl.value.trim();
                 
-                try {
-                    let imageUrl = '';
-                    
-                    // อัพโหลดรูปภาพหากมี
-                    if (currentImageFile) {
-                        const storageRef = storage.ref(`content-images/${currentImageFile.name}`);
-                        const snapshot = await storageRef.put(currentImageFile);
-                        imageUrl = await snapshot.ref.getDownloadURL();
+                // ตรวจสอบข้อมูลที่จำเป็น
+                if (!title || !description) {
+                    alert('กรุณากรอกหัวข้อและรายละเอียด');
+                    formSpinner.style.display = 'none';
+                    document.getElementById('submitBtn').disabled = false;
+                    if (document.getElementById('updateBtn')) {
+                        document.getElementById('updateBtn').disabled = false;
                     }
-                    
+                    return;
+                }
+
+                try {
                     const contentData = {
                         type,
                         title,
                         description,
-                        tags,
-                        platforms,
+                        tags: tags.filter(tag => tag !== ''),
+                        platforms: platforms.filter(platform => platform !== ''),
                         rating,
-                        image: imageUrl,
+                        image: imageUrl || '',
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        createdBy: localStorage.getItem('userId'),
+                        createdBy: auth.currentUser.uid,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     
                     if (currentEditId) {
-                        // อัปเดตเนื้อหาที่มีอยู่
                         await db.collection('contents').doc(currentEditId).update(contentData);
                         alert('อัปเดตเนื้อหาเรียบร้อยแล้ว!');
                     } else {
-                        // เพิ่มเนื้อหาใหม่
                         await db.collection('contents').add(contentData);
                         alert('บันทึกเนื้อหาเรียบร้อยแล้ว!');
                     }
                     
                     resetForm();
-                    renderLatestContents();
+                    loadContents();
                 } catch (error) {
-                    console.error('Error saving content: ', error);
-                    alert('เกิดข้อผิดพลาดในการบันทึกเนื้อหา: ' + error.message);
+                    console.error('Error:', error);
+                    alert('เกิดข้อผิดพลาด: ' + error.message);
+                } finally {
+                    formSpinner.style.display = 'none';
+                    document.getElementById('submitBtn').disabled = false;
+                    if (document.getElementById('updateBtn')) {
+                        document.getElementById('updateBtn').disabled = false;
+                    }
                 }
             });
-            
-            // ฟังก์ชันแสดงเนื้อหาล่าสุด
-            async function renderLatestContents() {
-                const latestContainer = document.getElementById('latestContent');
-                latestContainer.innerHTML = '<p>กำลังโหลดข้อมูล...</p>';
-                
+
+            // โหลดเนื้อหา
+            async function loadContents() {
                 try {
                     const snapshot = await db.collection('contents')
                         .orderBy('createdAt', 'desc')
                         .limit(6)
                         .get();
                     
+                    const container = document.getElementById('latestContent');
+                    container.innerHTML = '';
+
                     if (snapshot.empty) {
-                        latestContainer.innerHTML = '<p>ไม่มีเนื้อหา</p>';
+                        container.innerHTML = '<p>ยังไม่มีเนื้อหา</p>';
                         return;
                     }
-                    
-                    let contents = [];
+
                     snapshot.forEach(doc => {
-                        contents.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
-                    });
-                    
-                    latestContainer.innerHTML = contents.map(content => `
-                        <div class="news-item">
+                        const content = doc.data();
+                        const date = content.createdAt?.toDate() || new Date();
+                        
+                        const contentElement = document.createElement('div');
+                        contentElement.className = 'news-item';
+                        contentElement.innerHTML = `
                             ${content.image ? `<img src="${content.image}" class="news-image" alt="${content.title}">` : ''}
                             <div class="news-content">
                                 <h3 class="news-title">${content.title}</h3>
                                 <p>${content.description.substring(0, 100)}...</p>
                                 <div class="news-meta">
-                                    <span>${new Date(content.createdAt.seconds * 1000).toLocaleDateString()}</span>
+                                    <span>${date.toLocaleDateString('th-TH')}</span>
                                     <span>${getTypeName(content.type)}</span>
                                 </div>
                                 <div class="action-btns">
-                                    <button class="btn" onclick="editContent('${content.id}')">
+                                    <button class="btn" onclick="editContent('${doc.id}')">
                                         <i class="fas fa-edit"></i> แก้ไข
                                     </button>
-                                    <button class="btn btn-danger" onclick="deleteContent('${content.id}')">
+                                    <button class="btn btn-danger" onclick="deleteContent('${doc.id}')">
                                         <i class="fas fa-trash"></i> ลบ
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                        container.appendChild(contentElement);
+                    });
                 } catch (error) {
-                    console.error('Error loading contents: ', error);
-                    latestContainer.innerHTML = '<p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
+                    console.error('Error loading contents:', error);
+                    document.getElementById('latestContent').innerHTML = 
+                        '<p class="error">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
                 }
             }
-            
-            // ฟังก์ชันแก้ไขเนื้อหา
+
+            // แก้ไขเนื้อหา
             window.editContent = async function(id) {
                 try {
                     const doc = await db.collection('contents').doc(id).get();
-                    if (!doc.exists) {
-                        alert('ไม่พบเนื้อหานี้');
-                        return;
-                    }
+                    if (!doc.exists) return;
                     
                     const content = doc.data();
                     currentEditId = doc.id;
                     
-                    document.getElementById('contentId').value = doc.id;
+                    // เติมข้อมูลในฟอร์ม
                     document.getElementById('contentType').value = content.type;
                     document.getElementById('contentTitle').value = content.title;
                     document.getElementById('contentDescription').value = content.description;
-                    document.getElementById('contentTags').value = content.tags.join(', ');
-                    document.getElementById('contentPlatforms').value = content.platforms ? content.platforms.join(', ') : '';
-                    
-                    if (content.image) {
-                        const preview = document.getElementById('imagePreview');
-                        preview.src = content.image;
-                        preview.style.display = 'block';
-                    }
+                    document.getElementById('contentTags').value = content.tags?.join(', ') || '';
+                    document.getElementById('contentPlatforms').value = content.platforms?.join(', ') || '';
+                    document.getElementById('contentImageUrl').value = content.image || '';
                     
                     if (content.type === 'review') {
                         document.getElementById('ratingField').style.display = 'block';
-                        document.getElementById('contentRating').value = content.rating;
-                    } else {
-                        document.getElementById('ratingField').style.display = 'none';
+                        document.getElementById('contentRating').value = content.rating || '';
+                    }
+                    
+                    if (content.image) {
+                        document.getElementById('imagePreview').src = content.image;
+                        document.getElementById('imagePreview').style.display = 'block';
                     }
                     
                     document.getElementById('submitBtn').style.display = 'none';
@@ -916,31 +648,27 @@
                     document.getElementById('cancelBtn').style.display = 'inline-block';
                     
                     // เลื่อนไปที่ฟอร์ม
-                    document.getElementById('contentForm').scrollIntoView({ behavior: 'smooth' });
+                    contentForm.scrollIntoView({ behavior: 'smooth' });
                 } catch (error) {
-                    console.error('Error editing content: ', error);
-                    alert('เกิดข้อผิดพลาดในการแก้ไขเนื้อหา: ' + error.message);
+                    console.error('Error editing content:', error);
+                    alert('เกิดข้อผิดพลาดในการแก้ไขเนื้อหา');
                 }
             };
-            
-            // ฟังก์ชันลบเนื้อหา
+
+            // ลบเนื้อหา
             window.deleteContent = async function(id) {
-                if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบเนื้อหานี้?')) {
+                if (confirm('แน่ใจหรือไม่ว่าต้องการลบเนื้อหานี้?')) {
                     try {
                         await db.collection('contents').doc(id).delete();
-                        alert('ลบเนื้อหาเรียบร้อยแล้ว');
-                        renderLatestContents();
+                        loadContents();
                     } catch (error) {
-                        console.error('Error deleting content: ', error);
-                        alert('เกิดข้อผิดพลาดในการลบเนื้อหา: ' + error.message);
+                        console.error('Error deleting content:', error);
+                        alert('เกิดข้อผิดพลาดในการลบเนื้อหา');
                     }
                 }
             };
-            
-            // ฟังก์ชันยกเลิกการแก้ไข
-            document.getElementById('cancelBtn').addEventListener('click', resetForm);
-            
-            // ฟังก์ชันรีเซ็ตฟอร์ม
+
+            // รีเซ็ตฟอร์ม
             function resetForm() {
                 document.getElementById('contentForm').reset();
                 document.getElementById('imagePreview').style.display = 'none';
@@ -949,14 +677,26 @@
                 document.getElementById('updateBtn').style.display = 'none';
                 document.getElementById('cancelBtn').style.display = 'none';
                 currentEditId = null;
-                currentImageFile = null;
             }
-            
-            // โหลดข้อมูลครั้งแรก
-            renderLatestContents();
+
+            // ยกเลิกการแก้ไข
+            cancelBtn.addEventListener('click', resetForm);
+
+            // ปุ่มออกจากระบบ
+            const logoutBtn = document.querySelector('.logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(() => {
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('userRole');
+                        localStorage.removeItem('userId');
+                        window.location.href = 'Login.html';
+                    });
+                });
+            }
         });
-        
-        // ฟังก์ชันช่วยเหลือ
+
         function getTypeName(type) {
             const types = {
                 'review': 'รีวิวเกม',
